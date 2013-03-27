@@ -153,6 +153,12 @@
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
+    <PreBuildEvent>
+      <Command>xcopy $(OutDir)mono.exe $(SolutionDir)../../Build/Bin32/ /E /Y</Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>xcopy "$(SolutionDir)$(OutDir)mono.exe" "$(SolutionDir)..\..\Build\Bin32\" /E /Y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_SGen|Win32'">
     <ClCompile>
@@ -183,6 +189,12 @@
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
+    <PreBuildEvent>
+      <Command>xcopy $(OutDir)mono.exe $(SolutionDir)../../Build/Bin32/ /E /Y</Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>xcopy "$(SolutionDir)$(OutDir)mono.exe" "$(SolutionDir)..\..\Build\Bin32\" /E /Y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Midl>
@@ -212,6 +224,12 @@
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
+    <PreBuildEvent>
+      <Command>xcopy $(OutDir)mono.exe $(SolutionDir)../../Build/Bin64/ /E /Y</Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>xcopy "$(SolutionDir)$(OutDir)mono.exe" "$(SolutionDir)..\..\Build\Bin64\" /E /Y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_SGen|x64'">
     <Midl>
@@ -241,6 +259,12 @@
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
+    <PreBuildEvent>
+      <Command>xcopy $(OutDir)mono.exe $(SolutionDir)../../Build/Bin64/ /E /Y</Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>xcopy "$(SolutionDir)$(OutDir)mono.exe" "$(SolutionDir)..\..\Build\Bin64\" /E /Y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -269,6 +293,13 @@
       <TargetMachine>MachineX86</TargetMachine>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>xcopy "$(SolutionDir)$(OutDir)mono.exe" "$(SolutionDir)..\..\Build\Bin32\" /E /Y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_SGen|Win32'">
     <ClCompile>
@@ -297,6 +328,12 @@
       </DataExecutionPrevention>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
+    <PreBuildEvent>
+      <Command>xcopy $(OutDir)mono.exe $(SolutionDir)../../Build/Bin32/ /E /Y</Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>xcopy "$(SolutionDir)$(OutDir)mono.exe" "$(SolutionDir)..\..\Build\Bin32\" /E /Y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Midl>
@@ -325,6 +362,12 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
+    <PreBuildEvent>
+      <Command>xcopy $(OutDir)mono.exe $(SolutionDir)../../Build/Bin64/ /E /Y</Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>xcopy "$(SolutionDir)$(OutDir)mono.exe" "$(SolutionDir)..\..\Build\Bin64\" /E /Y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_SGen|x64'">
     <Midl>
@@ -353,6 +396,12 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
+    <PreBuildEvent>
+      <Command>xcopy $(OutDir)mono.exe $(SolutionDir)../../Build/Bin64/ /E /Y</Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>xcopy "$(SolutionDir)$(OutDir)mono.exe" "$(SolutionDir)..\..\Build\Bin64\" /E /Y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\mono\mini\main.c" />

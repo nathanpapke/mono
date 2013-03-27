@@ -288,6 +288,9 @@
       <ImportLibrary>$(Platform)\lib\$(TargetName).lib</ImportLibrary>
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy "$(SolutionDir)$(OutDir)mono-2.0.dll" "$(SolutionDir)..\..\Build\Bin32\" /E /Y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_SGen|Win32'">
     <PreBuildEvent>
@@ -330,6 +333,9 @@
       <ImportLibrary>$(Platform)\lib\$(TargetName).lib</ImportLibrary>
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy "$(SolutionDir)$(OutDir)mono-2.0.dll" "$(SolutionDir)..\..\Build\Bin32\" /E /Y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <PreBuildEvent>
@@ -372,6 +378,9 @@
       <ImportLibrary>$(Platform)\lib\$(TargetName).lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy "$(SolutionDir)$(OutDir)mono-2.0.dll" "$(SolutionDir)..\..\Build\Bin64\" /E /Y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_SGen|x64'">
     <PreBuildEvent>
@@ -414,6 +423,9 @@
       <ImportLibrary>$(Platform)\lib\$(TargetName).lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy "$(SolutionDir)$(OutDir)mono-2.0.dll" "$(SolutionDir)..\..\Build\Bin64\" /E /Y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <PreBuildEvent>
@@ -451,6 +463,9 @@
       <ImportLibrary>$(Platform)\lib\$(TargetName).lib</ImportLibrary>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy "$(SolutionDir)$(OutDir)mono-2.0.dll" "$(SolutionDir)..\..\Build\Bin32\" /E /Y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_SGen|Win32'">
     <PreBuildEvent>
@@ -489,6 +504,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy "$(SolutionDir)$(OutDir)mono-2.0.dll" "$(SolutionDir)..\..\Build\Bin32\" /E /Y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <PreBuildEvent>
@@ -527,6 +545,9 @@
       <TargetMachine>MachineX64</TargetMachine>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy "$(SolutionDir)$(OutDir)mono-2.0.dll" "$(SolutionDir)..\..\Build\Bin64\" /E /Y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_SGen|x64'">
     <PreBuildEvent>
@@ -565,6 +586,9 @@
       <TargetMachine>MachineX64</TargetMachine>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy "$(SolutionDir)$(OutDir)mono-2.0.dll" "$(SolutionDir)..\..\Build\Bin64\" /E /Y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <CustomBuildStep Include="..\mono\mini\mini-x86.h">
