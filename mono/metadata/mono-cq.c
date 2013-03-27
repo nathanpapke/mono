@@ -237,7 +237,7 @@ mono_cqitem_try_dequeue (MonoCQ *cq, MonoObject **obj)
 gboolean
 mono_cq_dequeue (MonoCQ *cq, MonoObject **result)
 {
-	while (cq->count > 0) {
+	while (cq != NULL && cq->count > 0) {
 		if (mono_cqitem_try_dequeue (cq, result)) {
 			CQ_DEBUG ("Dequeued one");
 			InterlockedDecrement (&cq->count);
