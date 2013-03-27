@@ -289,7 +289,7 @@
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)$(OutDir)mono-2.0.dll" "$(SolutionDir)..\..\Build\Bin32\" /E /Y</Command>
+      <Command>xcopy "$(OutDir)mono-2.0.dll" "$(OutDir)..\..\..\..\Build\Bin32\" /E /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_SGen|Win32'">
@@ -334,7 +334,7 @@
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)$(OutDir)mono-2.0.dll" "$(SolutionDir)..\..\Build\Bin32\" /E /Y</Command>
+      <Command>xcopy "$(OutDir)mono-2.0.dll" "$(OutDir)..\..\..\..\Build\Bin32\" /E /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -379,7 +379,7 @@
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)$(OutDir)mono-2.0.dll" "$(SolutionDir)..\..\Build\Bin64\" /E /Y</Command>
+      <Command>xcopy "$(OutDir)mono-2.0.dll" "$(OutDir)..\..\..\..\Build\Bin64\" /E /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_SGen|x64'">
@@ -424,7 +424,7 @@
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)$(OutDir)mono-2.0.dll" "$(SolutionDir)..\..\Build\Bin64\" /E /Y</Command>
+      <Command>xcopy "$(OutDir)mono-2.0.dll" "$(OutDir)..\..\..\..\Build\Bin64\" /E /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -464,7 +464,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)$(OutDir)mono-2.0.dll" "$(SolutionDir)..\..\Build\Bin32\" /E /Y</Command>
+      <Command>xcopy "$(OutDir)mono-2.0.dll" "$(OutDir)..\..\..\..\Build\Bin32\" /E /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_SGen|Win32'">
@@ -505,7 +505,7 @@
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)$(OutDir)mono-2.0.dll" "$(SolutionDir)..\..\Build\Bin32\" /E /Y</Command>
+      <Command>xcopy "$(OutDir)mono-2.0.dll" "$(OutDir)..\..\..\..\Build\Bin32\" /E /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -546,7 +546,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)$(OutDir)mono-2.0.dll" "$(SolutionDir)..\..\Build\Bin64\" /E /Y</Command>
+      <Command>xcopy "$(OutDir)mono-2.0.dll" "$(OutDir)..\..\..\..\Build\Bin64\" /E /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_SGen|x64'">
@@ -587,7 +587,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)$(OutDir)mono-2.0.dll" "$(SolutionDir)..\..\Build\Bin64\" /E /Y</Command>
+      <Command>xcopy "$(OutDir)mono-2.0.dll" "$(OutDir)..\..\..\..\Build\Bin64\" /E /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

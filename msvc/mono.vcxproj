@@ -154,10 +154,11 @@
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
-      <Command>xcopy $(OutDir)mono.exe $(SolutionDir)../../Build/Bin32/ /E /Y</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)$(OutDir)mono.exe" "$(SolutionDir)..\..\Build\Bin32\" /E /Y</Command>
+      <Command>xcopy "$(OutDir)mono.exe" "$(OutDir)..\..\..\..\Build\Bin32\" /E /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_SGen|Win32'">
@@ -190,10 +191,11 @@
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
-      <Command>xcopy $(OutDir)mono.exe $(SolutionDir)../../Build/Bin32/ /E /Y</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)$(OutDir)mono.exe" "$(SolutionDir)..\..\Build\Bin32\" /E /Y</Command>
+      <Command>xcopy "$(OutDir)mono.exe" "$(OutDir)..\..\..\..\Build\Bin32\" /E /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -225,10 +227,11 @@
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy $(OutDir)mono.exe $(SolutionDir)../../Build/Bin64/ /E /Y</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)$(OutDir)mono.exe" "$(SolutionDir)..\..\Build\Bin64\" /E /Y</Command>
+      <Command>xcopy "$(OutDir)mono.exe" "$(OutDir)..\..\..\..\Build\Bin64\" /E /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_SGen|x64'">
@@ -260,10 +263,11 @@
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy $(OutDir)mono.exe $(SolutionDir)../../Build/Bin64/ /E /Y</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)$(OutDir)mono.exe" "$(SolutionDir)..\..\Build\Bin64\" /E /Y</Command>
+      <Command>xcopy "$(OutDir)mono.exe" "$(OutDir)..\..\..\..\Build\Bin64\" /E /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -298,7 +302,7 @@
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)$(OutDir)mono.exe" "$(SolutionDir)..\..\Build\Bin32\" /E /Y</Command>
+      <Command>xcopy "$(OutDir)mono.exe" "$(OutDir)..\..\..\..\Build\Bin32\" /E /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_SGen|Win32'">
@@ -329,10 +333,11 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy $(OutDir)mono.exe $(SolutionDir)../../Build/Bin32/ /E /Y</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)$(OutDir)mono.exe" "$(SolutionDir)..\..\Build\Bin32\" /E /Y</Command>
+      <Command>xcopy "$(OutDir)mono.exe" "$(OutDir)..\..\..\..\Build\Bin32\" /E /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -363,10 +368,11 @@
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy $(OutDir)mono.exe $(SolutionDir)../../Build/Bin64/ /E /Y</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)$(OutDir)mono.exe" "$(SolutionDir)..\..\Build\Bin64\" /E /Y</Command>
+      <Command>xcopy "$(OutDir)mono.exe" "$(OutDir)..\..\..\..\Build\Bin64\" /E /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_SGen|x64'">
@@ -397,10 +403,11 @@
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy $(OutDir)mono.exe $(SolutionDir)../../Build/Bin64/ /E /Y</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)$(OutDir)mono.exe" "$(SolutionDir)..\..\Build\Bin64\" /E /Y</Command>
+      <Command>xcopy "$(OutDir)mono.exe" "$(OutDir)..\..\..\..\Build\Bin64\" /E /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
