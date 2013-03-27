@@ -1962,6 +1962,7 @@ emit_struct_conv_full (MonoMethodBuilder *mb, MonoClass *klass, gboolean to_obje
 				break;
 			}
 			case MONO_TYPE_OBJECT: {
+#ifndef DISABLE_COM
 				mono_init_com_types ();
 				if (to_object) {
 					static MonoMethod *variant_clear = NULL;
@@ -1989,7 +1990,11 @@ emit_struct_conv_full (MonoMethodBuilder *mb, MonoClass *klass, gboolean to_obje
 					mono_mb_emit_byte(mb, CEE_LDIND_REF);
 					mono_mb_emit_ldloc (mb, 1);
 					mono_mb_emit_managed_call (mb, get_native_variant_for_object, NULL);
-					}
+				}
+#else
+				char *msg = g_strdup_printf ("COM support was disabled at compilation time.");
+				mono_mb_emit_exception_marshal_directive (mb, msg);
+#endif
 				break;
 			}
 
@@ -2544,6 +2549,7 @@ mono_marshal_method_from_wrapper (MonoMethod *wrapper)
 	case MONO_WRAPPER_REMOTING_INVOKE_WITH_CHECK:
 	case MONO_WRAPPER_XDOMAIN_INVOKE:
 	case MONO_WRAPPER_SYNCHRONIZED:
+	case MONO_WRAPPER_UNBOX:
 		res = mono_marshal_get_wrapper_info (wrapper);
 		if (res == NULL)
 			return wrapper;
@@ -2920,18 +2926,16 @@ mono_marshal_get_remoting_invoke (MonoMethod *method)
 		return method;
 
 	/* this seems to be the best plase to put this, as all remoting invokes seem to get filtered through here */
+#ifndef DISABLE_COM
 	if (method->klass->is_com_object || method->klass == mono_defaults.com_object_class) {
 		MonoVTable *vtable = mono_class_vtable (mono_domain_get (), method->klass);
 		g_assert (vtable); /*FIXME do proper error handling*/
 
 		if (!vtable->remote) {
-#ifndef DISABLE_COM
 			return mono_cominterop_get_invoke (method);
-#else
-			g_assert_not_reached ();
-#endif
 		}
 	}
+#endif
 
 	sig = mono_signature_no_pinvoke (method);
 
@@ -3910,6 +3914,9 @@ mono_marshal_get_delegate_invoke (MonoMethod *method, MonoDelegate *del)
 	gboolean callvirt = FALSE;
 	gboolean closed_over_null = FALSE;
 	gboolean static_method_with_first_arg_bound = FALSE;
+	MonoGenericContext *ctx = NULL;
+	MonoGenericContainer *container = NULL;
+	MonoMethod *orig_method = NULL;
 
 	/*
 	 * If the delegate target is null, and the target method is not static, a virtual 
@@ -3945,7 +3952,54 @@ mono_marshal_get_delegate_invoke (MonoMethod *method, MonoDelegate *del)
 		static_method_with_first_arg_bound = TRUE;
 	}
 
-	if (callvirt || static_method_with_first_arg_bound) {
+	/*
+	 * For generic delegates, create a generic wrapper, and returns an instance to help AOT.
+	 */
+	if (method->is_inflated && !callvirt && !static_method_with_first_arg_bound) {
+		orig_method = method;
+		ctx = &((MonoMethodInflated*)method)->context;
+		method = ((MonoMethodInflated*)method)->declaring;
+
+		container = mono_method_get_generic_container (method);
+		if (!container)
+			container = method->klass->generic_container;
+		g_assert (container);
+
+		invoke_sig = sig = mono_signature_no_pinvoke (method);
+	}
+
+	/*
+	 * Check cache
+	 */
+	if (ctx) {
+		MonoMethod *def, *inst;
+
+		/*
+		 * Look for the instance
+		 */
+		cache = get_cache (&method->klass->image->delegate_invoke_generic_cache, mono_aligned_addr_hash, NULL);
+		res = mono_marshal_find_in_cache (cache, orig_method->klass);
+		if (res)
+			return res;
+
+		/*
+		 * Look for the definition
+		 */
+		def = mono_marshal_find_in_cache (cache, method->klass);
+		if (def) {
+			inst = mono_class_inflate_generic_method (def, ctx);
+			/* Cache it */
+			mono_memory_barrier ();
+			mono_marshal_lock ();
+			res = g_hash_table_lookup (cache, orig_method->klass);
+			if (!res) {
+				g_hash_table_insert (cache, orig_method->klass, inst);
+				res = inst;
+			}
+			mono_marshal_unlock ();
+			return res;
+		}
+	} else if (callvirt || static_method_with_first_arg_bound) {
 		GHashTable **cache_ptr;
 		if (static_method_with_first_arg_bound)
 			cache_ptr = &method->klass->image->delegate_bound_static_invoke_cache;
@@ -3967,7 +4021,8 @@ mono_marshal_get_delegate_invoke (MonoMethod *method, MonoDelegate *del)
 		cache = get_cache (&method->klass->image->delegate_invoke_cache,
 						   (GHashFunc)mono_signature_hash, 
 						   (GCompareFunc)mono_metadata_signature_equal);
-		if ((res = mono_marshal_find_in_cache (cache, sig)))
+		res = mono_marshal_find_in_cache (cache, sig);
+		if (res)
 			return res;
 	}
 
@@ -3977,7 +4032,10 @@ mono_marshal_get_delegate_invoke (MonoMethod *method, MonoDelegate *del)
 		invoke_sig = static_sig;
 
 	name = mono_signature_to_name (sig, "invoke");
-	mb = mono_mb_new (get_wrapper_target_class (method->klass->image), name,  MONO_WRAPPER_DELEGATE_INVOKE);
+	if (ctx)
+		mb = mono_mb_new (method->klass, name, MONO_WRAPPER_DELEGATE_INVOKE);
+	else
+		mb = mono_mb_new (get_wrapper_target_class (method->klass->image), name, MONO_WRAPPER_DELEGATE_INVOKE);
 	g_free (name);
 
 	/* allocate local 0 (object) */
@@ -4013,7 +4071,10 @@ mono_marshal_get_delegate_invoke (MonoMethod *method, MonoDelegate *del)
 	mono_mb_emit_ldloc (mb, local_prev);
 	for (i = 0; i < sig->param_count; i++)
 		mono_mb_emit_ldarg (mb, i + 1);
-	mono_mb_emit_op (mb, CEE_CALLVIRT, method);
+	if (ctx)
+		mono_mb_emit_op (mb, CEE_CALLVIRT, mono_class_inflate_generic_method (method, &container->context));
+	else
+		mono_mb_emit_op (mb, CEE_CALLVIRT, method);
 	if (sig->ret->type != MONO_TYPE_VOID)
 		mono_mb_emit_byte (mb, CEE_POP);
 
@@ -4081,9 +4142,27 @@ mono_marshal_get_delegate_invoke (MonoMethod *method, MonoDelegate *del)
 
 	mono_mb_emit_byte (mb, CEE_RET);
 
-	if (static_method_with_first_arg_bound || callvirt) {
+	mb->skip_visibility = 1;
+
+	if (ctx) {
+		MonoMethod *def, *inst;
+
+		/*
+		 * We use the same cache for the generic definition and the instances.
+		 */
+		def = mono_mb_create_and_cache (cache, method->klass, mb, sig, sig->param_count + 16);
+
+		inst = mono_class_inflate_generic_method (def, ctx);
+		mono_memory_barrier ();
+		mono_marshal_lock ();
+		res = g_hash_table_lookup (cache, orig_method->klass);
+		if (!res) {
+			g_hash_table_insert (cache, orig_method->klass, inst);
+			res = inst;
+		}
+		mono_marshal_unlock ();
+	} else if (static_method_with_first_arg_bound || callvirt) {
 		// From mono_mb_create_and_cache
-		mb->skip_visibility = 1;
 		newm = mono_mb_create_method (mb, sig, sig->param_count + 16);
 		/*We perform double checked locking, so must fence before publishing*/
 		mono_memory_barrier ();
@@ -4103,7 +4182,6 @@ mono_marshal_get_delegate_invoke (MonoMethod *method, MonoDelegate *del)
 			mono_free_method (newm);
 		}
 	} else {
-		mb->skip_visibility = 1;
 		res = mono_mb_create_and_cache (cache, sig, mb, sig, sig->param_count + 16);
 	}
 	mono_mb_free (mb);
@@ -6965,6 +7043,9 @@ emit_marshal_object (EmitMarshalContext *m, int argnum, MonoType *t,
 	return conv_arg;
 }
 
+
+#ifndef DISABLE_COM
+
 static int
 emit_marshal_variant (EmitMarshalContext *m, int argnum, MonoType *t,
 		     MonoMarshalSpec *spec, 
@@ -7079,6 +7160,8 @@ emit_marshal_variant (EmitMarshalContext *m, int argnum, MonoType *t,
 
 	return conv_arg;
 }
+
+#endif /* DISABLE_COM */
 
 static gboolean
 mono_pinvoke_is_unicode (MonoMethodPInvoke *piinfo)
@@ -8076,10 +8159,10 @@ emit_marshal (EmitMarshalContext *m, int argnum, MonoType *t,
 		return emit_marshal_string (m, argnum, t, spec, conv_arg, conv_arg_type, action);
 	case MONO_TYPE_CLASS:
 	case MONO_TYPE_OBJECT:
+#ifndef DISABLE_COM
 		if (spec && spec->native == MONO_NATIVE_STRUCT)
 			return emit_marshal_variant (m, argnum, t, spec, conv_arg, conv_arg_type, action);
 
-#ifndef DISABLE_COM
 		if (spec && (spec->native == MONO_NATIVE_IUNKNOWN ||
 			spec->native == MONO_NATIVE_IDISPATCH ||
 			spec->native == MONO_NATIVE_INTERFACE))
@@ -10581,6 +10664,80 @@ mono_marshal_get_stelemref ()
 	return ret;
 }
 
+/*
+ * mono_marshal_get_gsharedvt_in_wrapper:
+ *
+ *   This wrapper handles calls from normal code to gsharedvt code.
+ *
+ * The wrapper info for the wrapper is a WrapperInfo structure.
+ */
+MonoMethod*
+mono_marshal_get_gsharedvt_in_wrapper (void)
+{
+	static MonoMethod* ret = NULL;
+	MonoMethodSignature *sig;
+	MonoMethodBuilder *mb;
+	WrapperInfo *info;
+
+	if (ret)
+		return ret;
+	
+	mb = mono_mb_new (mono_defaults.object_class, "gsharedvt_in", MONO_WRAPPER_UNKNOWN);
+	
+	sig = mono_metadata_signature_alloc (mono_defaults.corlib, 0);
+	sig->ret = &mono_defaults.void_class->byval_arg;
+
+	/*
+	 * The body is generated by the JIT, we use a wrapper instead of a trampoline so EH works.
+	 */
+	mono_mb_emit_byte (mb, CEE_RET);
+
+	ret = mono_mb_create_method (mb, sig, 4);
+	mono_mb_free (mb);
+
+	info = mono_wrapper_info_create (ret, WRAPPER_SUBTYPE_GSHAREDVT_IN);
+	mono_marshal_set_wrapper_info (ret, info);
+
+	return ret;
+}
+
+/*
+ * mono_marshal_get_gsharedvt_out_wrapper:
+ *
+ *   This wrapper handles calls from gsharedvt code to normal code.
+ *
+ * The wrapper info for the wrapper is a WrapperInfo structure.
+ */
+MonoMethod*
+mono_marshal_get_gsharedvt_out_wrapper (void)
+{
+	static MonoMethod* ret = NULL;
+	MonoMethodSignature *sig;
+	MonoMethodBuilder *mb;
+	WrapperInfo *info;
+
+	if (ret)
+		return ret;
+	
+	mb = mono_mb_new (mono_defaults.object_class, "gsharedvt_out", MONO_WRAPPER_UNKNOWN);
+	
+	sig = mono_metadata_signature_alloc (mono_defaults.corlib, 0);
+	sig->ret = &mono_defaults.void_class->byval_arg;
+
+	/*
+	 * The body is generated by the JIT, we use a wrapper instead of a trampoline so EH works.
+	 */
+	mono_mb_emit_byte (mb, CEE_RET);
+
+	ret = mono_mb_create_method (mb, sig, 4);
+	mono_mb_free (mb);
+
+	info = mono_wrapper_info_create (ret, WRAPPER_SUBTYPE_GSHAREDVT_OUT);
+	mono_marshal_set_wrapper_info (ret, info);
+
+	return ret;
+}
+
 typedef struct {
 	int rank;
 	int elem_size;
@@ -12246,12 +12403,6 @@ mono_marshal_free_dynamic_wrappers (MonoMethod *method)
 		mono_marshal_unlock ();
 }
 
-/*
- * mono_marshal_free_inflated_wrappers:
- *
- *   Free wrappers of the inflated method METHOD.
- */
-
 static gboolean
 signature_method_pair_matches_signature (gpointer key, gpointer value, gpointer user_data)
 {
@@ -12261,6 +12412,11 @@ signature_method_pair_matches_signature (gpointer key, gpointer value, gpointer 
        return mono_metadata_signature_equal (pair->sig, sig);
 }
 
+/*
+ * mono_marshal_free_inflated_wrappers:
+ *
+ *   Free wrappers of the inflated method METHOD.
+ */
 void
 mono_marshal_free_inflated_wrappers (MonoMethod *method)
 {

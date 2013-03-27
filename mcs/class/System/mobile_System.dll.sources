@@ -4,6 +4,10 @@
 ../corlib/System.Collections.Generic/CollectionDebuggerView.cs
 ../corlib/System.Collections/CollectionDebuggerView.cs
 ../corlib/Mono/DataConverter.cs
+../corlib/System.Threading.Tasks/CyclicDeque.cs
+../corlib/System.Threading.Tasks/IConcurrentDeque.cs
+../corlib/System.Threading.Tasks/PopResult.cs
+../corlib/System.Threading/AtomicBoolean.cs
 
 Assembly/AssemblyInfo.cs
 Mono.Http/NtlmClient.cs
@@ -11,12 +15,14 @@ System.CodeDom.Compiler/GeneratedCodeAttribute.cs
 System.Collections.Generic/ISet.cs
 System.Collections.Generic/LinkedList.cs
 System.Collections.Generic/LinkedListNode.cs
-System.Collections.Generic/Queue.cs
 System.Collections.Generic/RBTree.cs
+System.Collections.Generic/Queue.cs
 System.Collections.Generic/SortedDictionary.cs
 System.Collections.Generic/SortedList.cs
 System.Collections.Generic/SortedSet.cs
 System.Collections.Generic/Stack.cs
+System.Collections.Concurrent/BlockingCollection.cs
+System.Collections.Concurrent/ConcurrentBag.cs
 System.Collections.ObjectModel/ObservableCollection.cs
 System.Collections.ObjectModel/ReadOnlyObservableCollection.cs
 System.Collections.Specialized/BitVector32.cs
@@ -60,6 +66,8 @@ System.ComponentModel.Design/MenuCommand.cs
 System.ComponentModel.Design/ServiceCreatorCallback.cs
 System.ComponentModel.Design/StandardCommands.cs
 System.ComponentModel.Design/ViewTechnology.cs
+System.ComponentModel/AddingNewEventArgs.cs
+System.ComponentModel/AddingNewEventHandler.cs
 System.ComponentModel/ArrayConverter.cs
 System.ComponentModel/AsyncCompletedEventArgs.cs
 System.ComponentModel/AsyncCompletedEventHandler.cs
@@ -69,6 +77,7 @@ System.ComponentModel/AttributeCollection.cs
 System.ComponentModel/BackgroundWorker.cs
 System.ComponentModel/BaseNumberConverter.cs
 System.ComponentModel/BindableSupport.cs
+System.ComponentModel/BindingList.cs
 System.ComponentModel/BooleanConverter.cs
 System.ComponentModel/BrowsableAttribute.cs
 System.ComponentModel/ByteConverter.cs
@@ -111,6 +120,7 @@ System.ComponentModel/ExpandableObjectConverter.cs
 System.ComponentModel/GuidConverter.cs
 System.ComponentModel/IBindingList.cs
 System.ComponentModel/IBindingListView.cs
+System.ComponentModel/ICancelAddNew.cs
 System.ComponentModel/IChangeTracking.cs
 System.ComponentModel/IComNativeDescriptorHandler.cs
 System.ComponentModel/IComponent.cs
@@ -120,9 +130,11 @@ System.ComponentModel/ICustomTypeDescriptor.cs
 System.ComponentModel/IDataErrorInfo.cs
 System.ComponentModel/IDataErrorInfo.cs
 System.ComponentModel/IEditableObject.cs
+System.ComponentModel/IExtenderProvider.cs
 System.ComponentModel/IListSource.cs
 System.ComponentModel/INotifyPropertyChanged.cs
 System.ComponentModel/INotifyPropertyChanging.cs
+System.ComponentModel/IRaiseItemChangedEvents.cs
 System.ComponentModel/IRevertibleChangeTracking.cs
 System.ComponentModel/ISite.cs
 System.ComponentModel/ISupportInitialize.cs
@@ -182,7 +194,6 @@ System.ComponentModel/ToolboxItemFilterAttribute.cs
 System.ComponentModel/ToolboxItemFilterType.cs
 System.ComponentModel/TypeConverter.cs
 System.ComponentModel/TypeConverterAttribute.cs
-System.ComponentModel/TypeConverter_2_1.cs
 System.ComponentModel/TypeDescriptionProvider.cs
 System.ComponentModel/TypeDescriptor.cs
 System.ComponentModel/TypeListConverter.cs
@@ -333,6 +344,7 @@ System.Net.Sockets/TcpClient.cs
 System.Net.Sockets/TcpListener.cs
 System.Net.Sockets/TransmitFileOptions.cs
 System.Net.Sockets/UdpClient.cs
+System.Net.Sockets/UdpReceiveResult.cs
 System.Net/AuthenticationManager.cs
 System.Net/AuthenticationSchemeSelector.cs
 System.Net/AuthenticationSchemes.cs
@@ -352,6 +364,7 @@ System.Net/DecompressionMethods.cs
 System.Net/DefaultCertificatePolicy.cs
 System.Net/DigestClient.cs
 System.Net/Dns.cs
+System.Net/DnsEndPoint.cs
 System.Net/DownloadDataCompletedEventArgs.cs
 System.Net/DownloadDataCompletedEventHandler.cs
 System.Net/DownloadProgressChangedEventArgs.cs
@@ -423,6 +436,7 @@ System.Net/SecurityProtocolType.cs
 System.Net/ServicePoint.cs
 System.Net/ServicePointManager.cs
 System.Net/SocketAddress.cs
+System.Net/TransportContext.cs
 System.Net/TransportType.cs
 System.Net/UploadDataCompletedEventArgs.cs
 System.Net/UploadDataCompletedEventHandler.cs
@@ -449,6 +463,7 @@ System.Net/WebProxy.cs
 System.Net/WebRequest.cs
 System.Net/WebRequestMethods.cs
 System.Net/WebResponse.cs
+System.Runtime.InteropServices/DefaultParameterValueAttribute.cs
 System.Security.AccessControl/SemaphoreAccessRule.cs
 System.Security.AccessControl/SemaphoreAuditRule.cs
 System.Security.AccessControl/SemaphoreRights.cs
@@ -457,8 +472,19 @@ System.Security.Authentication/AuthenticationException.cs
 System.Security.Authentication/CipherAlgorithmType.cs
 System.Security.Authentication/ExchangeAlgorithmType.cs
 System.Security.Authentication/HashAlgorithmType.cs
-System.Security.Authentication/InvalidCredentialException.cs
 System.Security.Authentication/SslProtocols.cs
+System.Security.Authentication/InvalidCredentialException.cs
+System.Security.Authentication.ExtendedProtection/ChannelBinding.cs
+System.Security.Authentication.ExtendedProtection/ChannelBindingKind.cs
+System.Security.Authentication.ExtendedProtection/ExtendedProtectionPolicy.cs
+System.Security.Authentication.ExtendedProtection/ExtendedProtectionPolicyTypeConverter.cs
+System.Security.Authentication.ExtendedProtection/PolicyEnforcement.cs
+System.Security.Authentication.ExtendedProtection/ProtectionScenario.cs
+System.Security.Authentication.ExtendedProtection/ServiceNameCollection.cs
+System.Security.Authentication.ExtendedProtection.Configuration/ConfigUtil.cs
+System.Security.Authentication.ExtendedProtection.Configuration/ExtendedProtectionPolicyElement.cs
+System.Security.Authentication.ExtendedProtection.Configuration/ServiceNameElement.cs
+System.Security.Authentication.ExtendedProtection.Configuration/ServiceNameElementCollection.cs
 System.Security.Cryptography.X509Certificates/OSX509Certificates.cs
 System.Security.Cryptography.X509Certificates/OpenFlags.cs
 System.Security.Cryptography.X509Certificates/PublicKey.cs
@@ -523,6 +549,8 @@ System.Text.RegularExpressions/parser.cs
 System.Text.RegularExpressions/quicksearch.cs
 System.Text.RegularExpressions/replace.cs
 System.Text.RegularExpressions/syntax.cs
+System.Threading/Barrier.cs
+System.Threading/BarrierPostPhaseException.cs
 System.Threading/Semaphore.cs
 System.Threading/SemaphoreFullException.cs
 System.Threading/ThreadExceptionEventArgs.cs

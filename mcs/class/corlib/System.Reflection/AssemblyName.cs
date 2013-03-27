@@ -248,6 +248,9 @@ namespace System.Reflection {
 
 		private bool IsPublicKeyValid {
 			get {
+//#if FULL_AOT_RUNTIME
+				//return true;
+//#else
 				// check for ECMA key
 				if (publicKey.Length == 16) {
 					int i = 0;
@@ -281,6 +284,7 @@ namespace System.Reflection {
 				}
 
 				return false;
+//#endif
 			}
 		}
 

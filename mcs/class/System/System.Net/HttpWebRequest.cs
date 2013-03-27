@@ -46,12 +46,8 @@ using System.Threading;
 
 namespace System.Net 
 {
-#if MOONLIGHT
-	internal class HttpWebRequest : WebRequest, ISerializable {
-#else
 	[Serializable]
 	public class HttpWebRequest : WebRequest, ISerializable {
-#endif
 		Uri requestUri;
 		Uri actualUri;
 		bool hostChanged;
@@ -560,7 +556,7 @@ namespace System.Net
 		internal ServicePoint ServicePointNoLock {
 			get { return servicePoint; }
 		}
-#if NET_4_5 || MOBILE
+#if NET_4_5
 		[MonoTODO ("for portable library support")]
 		public bool SupportsCookieContainer { 
 			get {
@@ -929,9 +925,12 @@ namespace System.Net
 
 		public override WebResponse GetResponse()
 		{
+			asynchronous = false;
 			WebAsyncResult result = (WebAsyncResult) BeginGetResponse (null, null);
 			return EndGetResponse (result);
 		}
+
+		internal bool asynchronous = true;
 		
 		internal bool FinishedReading {
 			get { return finished_reading; }

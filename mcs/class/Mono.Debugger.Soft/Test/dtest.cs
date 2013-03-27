@@ -97,7 +97,8 @@ public class DebuggerTests
 		// String
 		MethodMirror m = entry_point.DeclaringType.GetMethod (name);
 		Assert.IsNotNull (m);
-		vm.SetBreakpoint (m, 0);
+		Console.WriteLine ("X: " + name + " " + m.ILOffsets.Count + " " + m.Locations.Count);
+		vm.SetBreakpoint (m, m.ILOffsets [0]);
 
 		Event e = null;
 
@@ -2175,8 +2176,6 @@ public class DebuggerTests
 	void invoke_multiple_cb (IAsyncResult ar) {
 		ObjectMirror this_obj = (ObjectMirror)ar.AsyncState;
 
-		Console.WriteLine ("CB!");
-
 		var res = this_obj.EndInvokeMethod (ar);
 		lock (invoke_results)
 			invoke_results.Add (res);
@@ -2746,10 +2745,16 @@ public class DebuggerTests
 		// Check that invokes are disabled for such threads
 		TypeMirror t = frames [frame_index + 1].Method.DeclaringType;
 
-		// return void
 		var m = t.GetMethod ("invoke_static_return_void");
 		AssertThrows<InvalidOperationException> (delegate {
 				t.InvokeMethod (e.Thread, m, null);
+			});
+
+		// Check that the frame info is invalidated
+		run_until ("frames_in_native_2");
+
+		AssertThrows<InvalidStackFrameException> (delegate {
+				Console.WriteLine (frames [frame_index].GetThis ());
 			});
 	}
 
@@ -3082,6 +3087,51 @@ public class DebuggerTests
 
 		vm.Exit (0);
 		vm = null;
+	}
+
+#if NET_4_5
+	[Test]
+	public void UnhandledExceptionUserCode () {
+		vm.Detach ();
+
+		// Exceptions caught in non-user code are treated as unhandled
+		Start (new string [] { "dtest-app.exe", "unhandled-exception-user" });
+
+		var req = vm.CreateExceptionRequest (null, false, true);
+		req.AssemblyFilter = new List<AssemblyMirror> () { entry_point.DeclaringType.Assembly };
+		req.Enable ();
+
+		var e = run_until ("unhandled_exception_user");
+		vm.Resume ();
+
+		var e2 = GetNextEvent ();
+		Assert.IsTrue (e2 is ExceptionEvent);
+
+		vm.Exit (0);
+		vm = null;
+	}
+#endif
+
+	[Test]
+	public void GCWhileSuspended () {
+		// Check that objects are kept alive during suspensions
+		Event e = run_until ("gc_suspend_1");
+
+		MethodMirror m = entry_point.DeclaringType.GetMethod ("gc_suspend_invoke");
+
+		var o = entry_point.DeclaringType.GetValue (entry_point.DeclaringType.GetField ("gc_suspend_field")) as ObjectMirror;
+		//Console.WriteLine (o);
+
+		StackFrame frame = e.Thread.GetFrames () [0];
+		TypeMirror t = frame.Method.DeclaringType;
+		for (int i = 0; i < 10; ++i)
+			t.InvokeMethod (e.Thread, m, new Value [] { });
+
+		// This throws an exception if the object is collected
+		long addr = o.Address;
+
+		var o2 = entry_point.DeclaringType.GetValue (entry_point.DeclaringType.GetField ("gc_suspend_field")) as ObjectMirror;
+		Assert.IsNull (o2);
 	}
 }
 

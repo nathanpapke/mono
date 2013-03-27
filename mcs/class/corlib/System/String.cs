@@ -312,7 +312,7 @@ namespace System
 		}
 
 		// .NET 2.0 compatibility only
-#if !NET_4_0 && !MOONLIGHT && !MOBILE
+#if !NET_4_0 && !MOBILE
 		static readonly char[] WhiteChars = {
 			(char) 0x9, (char) 0xA, (char) 0xB, (char) 0xC, (char) 0xD,
 			(char) 0x85, (char) 0x1680, (char) 0x2028, (char) 0x2029,
@@ -324,7 +324,7 @@ namespace System
 
 		unsafe string[] SplitByCharacters (char[] sep, int count, bool removeEmpty)
 		{
-#if !NET_4_0 && !MOONLIGHT && !MOBILE
+#if !NET_4_0 && !MOBILE
 			if (sep == null || sep.Length == 0)
 				sep = WhiteChars;
 #endif
@@ -539,7 +539,7 @@ namespace System
 
 		unsafe int FindNotWhiteSpace (int pos, int target, int change)
 		{
-#if NET_4_0 || NET_2_1
+#if NET_4_0
 			fixed (char* src = this) {
 				while (pos != target) {
 					if (!char.IsWhiteSpace (src[pos]))
@@ -769,16 +769,30 @@ namespace System
 
 		public static int CompareOrdinal (String strA, int indexA, String strB, int indexB, int length)
 		{
-			if ((indexA > strA.Length) || (indexB > strB.Length) || (indexA < 0) || (indexB < 0) || (length < 0))
-				throw new ArgumentOutOfRangeException ();
+			if (strA != null && strB != null)
+			{
+				if (indexA > strA.Length || indexA < 0)
+					throw new ArgumentOutOfRangeException ("indexA");
+				if (indexB > strB.Length || indexB < 0)
+					throw new ArgumentOutOfRangeException ("indexB");
+				if (length < 0)
+					throw new ArgumentOutOfRangeException ("length");
+			}
 
 			return CompareOrdinalUnchecked (strA, indexA, length, strB, indexB, length);
 		}
 
 		internal static int CompareOrdinalCaseInsensitive (String strA, int indexA, String strB, int indexB, int length)
 		{
-			if ((indexA > strA.Length) || (indexB > strB.Length) || (indexA < 0) || (indexB < 0) || (length < 0))
-				throw new ArgumentOutOfRangeException ();
+			if (strA != null && strB != null)
+			{
+				if (indexA > strA.Length || indexA < 0)
+					throw new ArgumentOutOfRangeException ("indexA");
+				if (indexB > strB.Length || indexB < 0)
+					throw new ArgumentOutOfRangeException ("indexB");
+				if (length < 0)
+					throw new ArgumentOutOfRangeException ("length");
+			}
 
 			return CompareOrdinalCaseInsensitiveUnchecked (strA, indexA, length, strB, indexB, length);
 		}
@@ -815,11 +829,9 @@ namespace System
 		{
 			// Same as above, but checks versus uppercase characters
 			if (strA == null) {
-				if (strB == null)
-					return 0;
-				else
-					return -1;
-			} else if (strB == null) {
+				return strB == null ? 0 : -1;
+			}
+			if (strB == null) {
 				return 1;
 			}
 			int lengthA = Math.Min (lenA, strA.Length - indexA);
@@ -1499,7 +1511,6 @@ namespace System
 			return (value == null) || (value.Length == 0);
 		}
 
-#if !MOONLIGHT
 		public string Normalize ()
 		{
 			return Normalization.Normalize (this, 0);
@@ -1537,7 +1548,6 @@ namespace System
 				return Normalization.IsNormalized (this, 3);
 			}
 		}
-#endif
 
 		public string Remove (int startIndex)
 		{
@@ -2323,7 +2333,7 @@ namespace System
 			return InternalIsInterned (str);
 		}
 	
-#if NET_4_0 || MOONLIGHT || MOBILE
+#if NET_4_0
 		public static string Join (string separator, params string [] value)
 #else
 		public static string Join (string separator, string [] value)
@@ -2631,7 +2641,7 @@ namespace System
 			}
 		}
 
-#if MOONLIGHT || MOBILE || NET_4_0
+#if NET_4_0
 		[ComVisible(false)]
 		public static string Concat (IEnumerable<string> values)
 		{

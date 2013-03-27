@@ -36,7 +36,6 @@ namespace Mono.CSharp
 	public interface IAssemblyDefinition
 	{
 		string FullName { get; }
-		bool HasExtensionMethod { get; }
 		bool IsCLSCompliant { get; }
 		bool IsMissing { get; }
 		string Name { get; }
@@ -129,12 +128,6 @@ namespace Mono.CSharp
 		public string FullName {
 			get {
 				return Builder.FullName;
-			}
-		}
-
-		public bool HasExtensionMethod {
-			get {
-				return module.HasExtensionMethod;
 			}
 		}
 
@@ -1111,8 +1104,8 @@ namespace Mono.CSharp
 			this.compiler = compiler;
 
 			paths = new List<string> ();
-			paths.AddRange (compiler.Settings.ReferencesLookupPaths);
 			paths.Add (Directory.GetCurrentDirectory ());
+			paths.AddRange (compiler.Settings.ReferencesLookupPaths);
 		}
 
 		public abstract bool HasObjectType (T assembly);

@@ -177,10 +177,10 @@ ICALL(DEBUGR_3, "Log", ves_icall_System_Diagnostics_Debugger_Log)
 ICALL_TYPE(TRACEL, "System.Diagnostics.DefaultTraceListener", TRACEL_1)
 ICALL(TRACEL_1, "WriteWindowsDebugString", ves_icall_System_Diagnostics_DefaultTraceListener_WriteWindowsDebugString)
 
-#ifndef DISABLE_PROCESS_HANDLING
 ICALL_TYPE(FILEV, "System.Diagnostics.FileVersionInfo", FILEV_1)
 ICALL(FILEV_1, "GetVersionInfo_internal(string)", ves_icall_System_Diagnostics_FileVersionInfo_GetVersionInfo_internal)
 
+#ifndef DISABLE_PROCESS_HANDLING
 ICALL_TYPE(PERFCTR, "System.Diagnostics.PerformanceCounter", PERFCTR_1)
 ICALL(PERFCTR_1, "FreeData", mono_perfcounter_free_data)
 ICALL(PERFCTR_2, "GetImpl", mono_perfcounter_get_impl)
@@ -315,7 +315,7 @@ ICALL(INOW_1, "AddWatch", ves_icall_System_IO_InotifyWatcher_AddWatch)
 ICALL(INOW_2, "GetInotifyInstance", ves_icall_System_IO_InotifyWatcher_GetInotifyInstance)
 ICALL(INOW_3, "RemoveWatch", ves_icall_System_IO_InotifyWatcher_RemoveWatch)
 
-#if (defined (__MACH__) && defined (TARGET_ARM)) || defined (TARGET_ANDROID)
+#if defined (TARGET_IOS) || defined (TARGET_ANDROID)
 ICALL_TYPE(MMAPIMPL, "System.IO.MemoryMappedFiles.MemoryMapImpl", MMAPIMPL_1)
 ICALL(MMAPIMPL_1, "mono_filesize_from_fd", mono_filesize_from_fd)
 ICALL(MMAPIMPL_2, "mono_filesize_from_path", mono_filesize_from_path)

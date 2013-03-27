@@ -773,7 +773,11 @@ namespace System.Net
 
 			request.SetWriteStream (new WebConnectionStream (this, request));
 		}
-		
+
+#if MONOTOUCH
+		static bool warned_about_queue = false;
+#endif
+
 		internal EventHandler SendRequest (HttpWebRequest request)
 		{
 			if (request.Aborted)
@@ -783,9 +787,19 @@ namespace System.Net
 				if (!busy) {
 					busy = true;
 					status = WebExceptionStatus.Success;
-					ThreadPool.QueueUserWorkItem (initConn, request);
+
+					if (request.asynchronous)
+						ThreadPool.QueueUserWorkItem (initConn, request);
+					else
+						initConn.Invoke (request);
 				} else {
 					lock (queue) {
+#if MONOTOUCH
+						if (!warned_about_queue) {
+							warned_about_queue = true;
+							Console.WriteLine ("WARNING: An HttpWebRequest was added to the ConnectionGroup queue because the connection limit was reached.");
+						}
+#endif
 						queue.Enqueue (request);
 					}
 				}

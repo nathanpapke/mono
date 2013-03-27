@@ -180,13 +180,18 @@ mono_arch_create_generic_trampoline (MonoTrampolineType tramp_type, MonoTrampInf
 
 	if (aot && tramp_type != MONO_TRAMPOLINE_GENERIC_CLASS_INIT) {
 		/* 
+		 * For page trampolines the data is in r1, so just move it, otherwise use the got slot as below.
 		 * The trampoline contains a pc-relative offset to the got slot 
 		 * preceeding the got slot where the value is stored. The offset can be
 		 * found at [lr + 0].
 		 */
-		ARM_LDR_IMM (code, ARMREG_V2, ARMREG_LR, 0);
-		ARM_ADD_REG_IMM (code, ARMREG_V2, ARMREG_V2, 4, 0);
-		ARM_LDR_REG_REG (code, ARMREG_V2, ARMREG_V2, ARMREG_LR);
+		if (aot == 2) {
+			ARM_MOV_REG_REG (code, ARMREG_V2, ARMREG_R1);
+		} else {
+			ARM_LDR_IMM (code, ARMREG_V2, ARMREG_LR, 0);
+			ARM_ADD_REG_IMM (code, ARMREG_V2, ARMREG_V2, 4, 0);
+			ARM_LDR_REG_REG (code, ARMREG_V2, ARMREG_V2, ARMREG_LR);
+		}
 	} else {
 		if (tramp_type != MONO_TRAMPOLINE_GENERIC_CLASS_INIT)
 			ARM_LDR_IMM (code, ARMREG_V2, ARMREG_LR, 0);
@@ -740,8 +745,13 @@ mono_arch_get_call_target (guint8 *code)
 {
 	guint32 ins = ((guint32*)(gpointer)code) [-1];
 
+#if MONOTOUCH
+	/* Should be a 'bl' or a 'b' */
+	if (((ins >> 25) & 0x7) == 0x5) {
+#else
 	/* Should be a 'bl' */
 	if ((((ins >> 25) & 0x7) == 0x5) && (((ins >> 24) & 0x1) == 0x1)) {
+#endif
 		gint32 disp = ((gint32)ins) & 0xffffff;
 		guint8 *target = code - 4 + 8 + (disp * 4);
 
@@ -806,3 +816,65 @@ mono_arm_get_thumb_plt_entry (guint8 *code)
 
 	return target;
 }
+
+#ifndef DISABLE_JIT
+
+/*
+ * mono_arch_get_gsharedvt_arg_trampoline:
+ *
+ *   See tramp-x86.c for documentation.
+ */
+gpointer
+mono_arch_get_gsharedvt_arg_trampoline (MonoDomain *domain, gpointer arg, gpointer addr)
+{
+	guint8 *code, *start;
+	int buf_len;
+	gpointer *constants;
+
+	buf_len = 24;
+
+	start = code = mono_domain_code_reserve (domain, buf_len);
+
+	/* Similar to the specialized trampoline code */
+	ARM_PUSH (code, (1 << ARMREG_R0) | (1 << ARMREG_R1) | (1 << ARMREG_R2) | (1 << ARMREG_R3) | (1 << ARMREG_LR));
+	ARM_LDR_IMM (code, ARMREG_IP, ARMREG_PC, 8);
+	/* arg is passed in LR */
+	ARM_LDR_IMM (code, ARMREG_LR, ARMREG_PC, 0);
+	code = emit_bx (code, ARMREG_IP);
+	constants = (gpointer*)code;
+	constants [0] = arg;
+	constants [1] = addr;
+	code += 8;
+
+	g_assert ((code - start) <= buf_len);
+
+	nacl_domain_code_validate (domain, &start, buf_len, &code);
+	mono_arch_flush_icache (start, code - start);
+
+	return start;
+}
+
+#endif
+
+#if defined(MONOTOUCH) || defined(MONO_EXTENSIONS)
+
+#include "../../../mono-extensions/mono/mini/tramp-arm-gsharedvt.c"
+
+#else
+
+gpointer
+mono_arm_start_gsharedvt_call (GSharedVtCallInfo *info, gpointer *caller, gpointer *callee, gpointer *caller_regs, gpointer *callee_regs)
+{
+	g_assert_not_reached ();
+	return NULL;
+}
+
+gpointer
+mono_arch_get_gsharedvt_trampoline (MonoTrampInfo **info, gboolean aot)
+{
+	if (info)
+		*info = NULL;
+	return NULL;
+}
+
+#endif /* !MONOTOUCH */

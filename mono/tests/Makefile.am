@@ -44,6 +44,7 @@ STRESS_TESTS_SRC=	\
 # Disabled until ?mcs is fixed
 #	bug-331958.cs
 BASE_TEST_CS_SRC=		\
+	bug-2907.cs		\
 	array-init.cs		\
 	arraylist.cs		\
 	assemblyresolve_event.cs	\
@@ -386,7 +387,8 @@ BASE_TEST_CS_SRC=		\
 	bug-3903.cs	\
 	async-with-cb-throws.cs	\
 	appdomain-unload-doesnot-raise-pending-events.cs	\
-	bug-6148.cs
+	bug-6148.cs	\
+	assembly_append_ordering.cs
 
 TEST_CS_SRC_DIST=	\
 	$(BASE_TEST_CS_SRC)	\
@@ -656,7 +658,7 @@ test_cs: $(TEST_PROG) $(TESTSI_CS) libtest.la
 	@failed=0; \
 	passed=0; \
 	for i in $(TESTSI_CS); do	\
-		if $(srcdir)/test-driver '$(with_mono_path) $(TEST_PROG_RUN)' $$i '$(DISABLED_TESTS)' $(RUNTIME_ARGS); \
+		if $(srcdir)/test-driver '$(with_mono_path) $(TEST_PROG_RUN)' $$i '$(DISABLED_TESTS)' 'no-dump' $(RUNTIME_ARGS); \
 		then \
 			passed=`expr $${passed} + 1`; \
 		else \
@@ -670,7 +672,7 @@ test_il: $(TEST_PROG) $(TESTSI_IL) libtest.la
 	@failed=0; \
 	passed=0; \
 	for i in $(TESTSI_IL); do	\
-		if $(srcdir)/test-driver '$(with_mono_path) $(TEST_PROG_RUN)' $$i "$(DISABLED_TESTS)" $(RUNTIME_ARGS); \
+		if $(srcdir)/test-driver '$(with_mono_path) $(TEST_PROG_RUN)' $$i "$(DISABLED_TESTS)" 'no-dump' $(RUNTIME_ARGS); \
 		then \
 			passed=`expr $${passed} + 1`; \
 		else \
@@ -682,7 +684,7 @@ test_il: $(TEST_PROG) $(TESTSI_IL) libtest.la
 
 testb: $(TEST_PROG) $(TESTBS)
 	for i in $(TESTBS); do	\
-		$(srcdir)/test-driver '$(with_mono_path) $(TEST_PROG_RUN)' $$i '$(DISABLED_TESTS)' $(RUNTIME_ARGS);	\
+		$(srcdir)/test-driver '$(with_mono_path) $(TEST_PROG_RUN)' $$i '$(DISABLED_TESTS)' 'no-dump' $(RUNTIME_ARGS);	\
 	done
 
 runtest-wrench: $(TESTSI_CS) $(TESTSI_IL) $(TESTBS) libtest.la $(PREREQSI_IL) $(PREREQSI_CS)
@@ -692,7 +694,7 @@ runtest-wrench: $(TESTSI_CS) $(TESTSI_IL) $(TESTBS) libtest.la $(PREREQSI_IL) $(
 	for i in $(TESTSI_CS) $(TESTBS) $(TESTSI_IL); do	\
 		rm -f $${i}.so; \
 		if [ x$(AOT) = x1 ]; then if echo $(AOT_DISABLED_TESTS) | grep -v -q $${i}; then $(with_mono_path) $(JITTEST_PROG_RUN) --aot --debug $${i} > $${i}.aotlog 2>&1 || exit 1; fi; fi; \
-		if $(srcdir)/test-driver '$(with_mono_path) $(JITTEST_PROG_RUN)' $$i '$(DISABLED_TESTS_WRENCH)' $(RUNTIME_ARGS); \
+		if $(srcdir)/test-driver '$(with_mono_path) $(JITTEST_PROG_RUN)' $$i '$(DISABLED_TESTS_WRENCH)' 'dump-output' $(RUNTIME_ARGS); \
 		then \
 			passed=`expr $${passed} + 1`; \
 		else \
@@ -718,7 +720,7 @@ runtest: $(TESTSI_CS) $(TESTSI_IL) $(TESTBS) libtest.la $(PREREQSI_IL) $(PREREQS
 	for i in $(TESTSI_CS) $(TESTBS) $(TESTSI_IL); do	\
 		rm -f $${i}.so; \
 		if [ x$(AOT) = x1 ]; then if echo $(AOT_DISABLED_TESTS) | grep -v -q $${i}; then $(with_mono_path) $(JITTEST_PROG_RUN) --aot --debug $${i} > $${i}.aotlog 2>&1 || exit 1; fi; fi; \
-		if $(srcdir)/test-driver '$(with_mono_path) $(JITTEST_PROG_RUN)' $$i '$(DISABLED_TESTS)' $(RUNTIME_ARGS); \
+		if $(srcdir)/test-driver '$(with_mono_path) $(JITTEST_PROG_RUN)' $$i '$(DISABLED_TESTS)' 'no-dump' $(RUNTIME_ARGS); \
 		then \
 			passed=`expr $${passed} + 1`; \
 		else \
@@ -791,33 +793,90 @@ test-type-load: TestDriver.dll
 	@$(RUNTIME) load-exceptions.exe > load-exceptions.exe.stdout 2> load-exceptions.exe.stderr
 
 
-EXTRA_DIST += sgen-bridge.cs sgen-descriptors.cs sgen-gshared-vtype.cs sgen-bridge-major-fragmentation.cs
+EXTRA_DIST += sgen-bridge.cs sgen-descriptors.cs sgen-gshared-vtype.cs sgen-bridge-major-fragmentation.cs sgen-domain-unload.cs sgen-weakref-stress.cs sgen-cementing-stress.cs sgen-case-23400.cs
+
+#those are actually configurations, eg plain_sgen-descriptors.exe
+#DISABLE_SGEN_TESTS =
 
 SGEN_TESTS =	\
 	sgen-descriptors.exe	\
-	sgen-gshared-vtype.exe
+	sgen-gshared-vtype.exe	\
+	sgen-domain-unload.exe	\
+	sgen-weakref-stress.exe	\
+	sgen-cementing-stress.exe	\
+	sgen-case-23400.exe
+
+SGEN_CONFIGURATIONS =	\
+	"|plain"	\
+	"major=marksweep-par|ms-par"	\
+	"major=marksweep-conc|ms-conc"	\
+	"major=marksweep-conc,minor=split|ms-conc-split"	\
+	"major=marksweep-par,minor=split|ms-par-split"	\
+	"minor=split|ms-split"	\
+	"major=marksweep-par,minor=split,alloc-ratio=95|ms-par-split-95"	\
+	"minor=split,alloc-ratio=95|ms-split-95"	\
+	"major=marksweep-par,wbarrier=remset|ms-par-ssb"	\
+	"wbarrier=remset|ms-ssb"	\
+	"major=marksweep-par,minor=split,wbarrier=remset|ms-par-split-ssb"	\
+	"minor=split,wbarrier=remset|ms-split-ssb"	\
+	"major=marksweep-par,minor=split,alloc-ratio=95,wbarrier=remset|ms-par-split-ssb-95"	\
+	"minor=split,alloc-ratio=95,wbarrier=remset|ms-split-ssb-95"
+
+#FIXME We should move to use SGEN_CONFIGURATIONS once sgen supports trailling commas or its argument list.
+SGEN_BRIDGE_CONFIGURATIONS =	\
+	"|plain"	\
+	",major=marksweep-conc|ms-conc"	\
+	",minor=split|ms-split"
 
 sgen-regular-tests: $(SGEN_TESTS)
-	@for fn in $+ ; do	\
-		echo "Testing $$fn ...";	\
-		MONO_GC_PARAMS=major=marksweep-par MONO_ENV_OPTIONS="--gc=sgen" $(RUNTIME) $$fn > $$fn.stdout 2> $$fn.stderr || exit 1;	\
-		MONO_ENV_OPTIONS="--gc=sgen"                                    $(RUNTIME) $$fn > $$fn.stdout 2> $$fn.stderr || exit 1;	\
-		MONO_GC_PARAMS=major=marksweep-par,minor=split MONO_ENV_OPTIONS="--gc=sgen" $(RUNTIME) $$fn > $$fn.stdout 2> $$fn.stderr || exit 1;	\
-		MONO_GC_PARAMS=minor=split MONO_ENV_OPTIONS="--gc=sgen"                     $(RUNTIME) $$fn > $$fn.stdout 2> $$fn.stderr || exit 1;	\
-		MONO_GC_PARAMS=major=marksweep,concurrent-sweep MONO_ENV_OPTIONS="--gc=sgen" $(RUNTIME) $$fn > $$fn.stdout 2> $$fn.stderr || exit 1;	\
-		MONO_GC_PARAMS=minor=split,major=marksweep,concurrent-sweep MONO_ENV_OPTIONS="--gc=sgen" $(RUNTIME) $$fn > $$fn.stdout 2> $$fn.stderr || exit 1;	\
-		MONO_GC_PARAMS=major=marksweep-par,minor=split,alloc-ratio=95 MONO_ENV_OPTIONS="--gc=sgen" $(RUNTIME) $$fn > $$fn.stdout 2> $$fn.stderr || exit 1;	\
-		MONO_GC_PARAMS=minor=split,alloc-ratio=95 MONO_ENV_OPTIONS="--gc=sgen"                     $(RUNTIME) $$fn > $$fn.stdout 2> $$fn.stderr || exit 1;	\
-	done
+	@failed=0; \
+	passed=0; \
+	failed_tests="";\
+	for test in $+; do	\
+		echo "...$$test";	\
+		for conf in $(SGEN_CONFIGURATIONS); do 	\
+			name=`echo $$conf | cut -d\| -f 2`;	\
+			params=`echo $$conf | cut -d\| -f 1`;	\
+			test_name="$${test}|$${name}";	\
+			if MONO_GC_PARAMS="$$params" MONO_ENV_OPTIONS="--gc=sgen" $(srcdir)/test-driver '$(with_mono_path) $(JITTEST_PROG_RUN)' $$test_name "$(DISABLED_TESTS_SGEN)" 'dump-output' $(RUNTIME_ARGS);	\
+			then \
+				passed=`expr $${passed} + 1`; \
+			else \
+				if [ $$? = 2 ]; then break; fi; \
+				failed=`expr $${failed} + 1`; \
+				failed_tests="$${failed_tests} $$test_name"; \
+			fi \
+		done	\
+	done;	\
+	echo "$${passed} test(s) passed. $${failed} test(s) did not pass."; \
+	if [ $${failed} != 0 ]; then echo -e "\nFailed tests:\n"; \
+	  for i in $${failed_tests}; do echo $${i}; done; exit 1; fi
 
+sgen-bridge-tests: sgen-bridge.exe sgen-bridge-major-fragmentation.exe
+	@failed=0; \
+	passed=0; \
+	failed_tests="";\
+	for test in $+; do	\
+		echo "...$$test";	\
+		for conf in $(SGEN_BRIDGE_CONFIGURATIONS); do 	\
+			name=`echo $$conf | cut -d\| -f 2`;	\
+			params=`echo $$conf | cut -d\| -f 1`;	\
+			test_name="$${test}|$${name}";	\
+			if MONO_GC_PARAMS="bridge=Bridge$${params}" MONO_ENV_OPTIONS="--gc=sgen" $(srcdir)/test-driver '$(with_mono_path) $(JITTEST_PROG_RUN)' $$test_name "$(DISABLED_TESTS_SGEN)" 'dump-output' $(RUNTIME_ARGS);	\
+			then \
+				passed=`expr $${passed} + 1`; \
+			else \
+				if [ $$? = 2 ]; then break; fi; \
+				failed=`expr $${failed} + 1`; \
+				failed_tests="$${failed_tests} $$test_name"; \
+			fi \
+		done	\
+	done;	\
+	echo "$${passed} test(s) passed. $${failed} test(s) did not pass."; \
+	if [ $${failed} != 0 ]; then echo -e "\nFailed tests:\n"; \
+	  for i in $${failed_tests}; do echo $${i}; done; exit 1; fi
 
-sgen-tests: sgen-regular-tests sgen-bridge.exe sgen-bridge-major-fragmentation.exe
-	@echo "Testing sgen-bridge.exe ...";	\
-	MONO_GC_PARAMS=bridge=Bridge MONO_ENV_OPTIONS="--gc=sgen" $(RUNTIME) sgen-bridge.exe > sgen-bridge.exe.stdout 2> sgen-bridge.exe.stderr || exit 1;	\
-	MONO_GC_PARAMS=bridge=Bridge,minor=split MONO_ENV_OPTIONS="--gc=sgen" $(RUNTIME) sgen-bridge.exe > sgen-bridge.exe.stdout 2> sgen-bridge.exe.stderr || exit 1;	\
-	echo "Testing sgen-bridge-major-fragmentation.exe ...";	\
-	MONO_GC_PARAMS=bridge=Bridge MONO_ENV_OPTIONS="--gc=sgen" $(RUNTIME) sgen-bridge-major-fragmentation.exe > sgen-bridge-major-fragmentation.exe.stdout 2> sgen-bridge-major-fragmentation.exe.stderr || exit 1;	\
-	MONO_GC_PARAMS=bridge=Bridge,minor=split MONO_ENV_OPTIONS="--gc=sgen" $(RUNTIME) sgen-bridge-major-fragmentation.exe > sgen-bridge-major-fragmentation.exe.stdout 2> sgen-bridge-major-fragmentation.exe.stderr || exit 1;
+sgen-tests: sgen-regular-tests sgen-bridge-tests
 
 
 # Generated tests for runtime invoke

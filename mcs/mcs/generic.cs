@@ -416,6 +416,12 @@ namespace Mono.CSharp {
 			}
 		}
 
+		bool ITypeDefinition.IsComImport {
+			get {
+				return false;
+			}
+		}
+
 		bool ITypeDefinition.IsPartial {
 			get {
 				return false;
@@ -425,6 +431,12 @@ namespace Mono.CSharp {
 		public bool IsMethodTypeParameter {
 			get {
 				return spec.IsMethodOwned;
+			}
+		}
+
+		bool ITypeDefinition.IsTypeForwarder {
+			get {
+				return false;
 			}
 		}
 
@@ -748,17 +760,35 @@ namespace Mono.CSharp {
 			get {
 				if ((state & StateFlags.InterfacesExpanded) == 0) {
 					if (ifaces != null) {
-						for (int i = 0; i < ifaces.Count; ++i ) {
-							var iface_type = ifaces[i];
-							if (iface_type.Interfaces != null) {
-								if (ifaces_defined == null)
-									ifaces_defined = ifaces.ToArray ();
+						if (ifaces_defined == null)
+							ifaces_defined = ifaces.ToArray ();
 
+						for (int i = 0; i < ifaces_defined.Length; ++i ) {
+							var iface_type = ifaces_defined[i];
+							var td = iface_type.MemberDefinition as TypeDefinition;
+							if (td != null)
+								td.DoExpandBaseInterfaces ();
+
+							if (iface_type.Interfaces != null) {
 								for (int ii = 0; ii < iface_type.Interfaces.Count; ++ii) {
 									var ii_iface_type = iface_type.Interfaces [ii];
-
 									AddInterface (ii_iface_type);
 								}
+							}
+						}
+					}
+
+					//
+					// Include all base type interfaces too, see ImportTypeBase for details
+					//
+					if (BaseType != null) {
+						var td = BaseType.MemberDefinition as TypeDefinition;
+						if (td != null)
+							td.DoExpandBaseInterfaces ();
+
+						if (BaseType.Interfaces != null) {
+							foreach (var iface in BaseType.Interfaces) {
+								AddInterface (iface);
 							}
 						}
 					}
@@ -790,7 +820,7 @@ namespace Mono.CSharp {
 			set {
 				ifaces_defined = value;
 				if (value != null && value.Length != 0)
-					ifaces = value;
+					ifaces = new List<TypeSpec> (value);
 			}
 		}
 
@@ -1150,6 +1180,15 @@ namespace Mono.CSharp {
 		public void InflateConstraints (TypeParameterInflator inflator, TypeParameterSpec tps)
 		{
 			tps.BaseType = inflator.Inflate (BaseType);
+
+			var defined = InterfacesDefined;
+			if (defined != null) {
+				tps.ifaces_defined = new TypeSpec[defined.Length];
+				for (int i = 0; i < defined.Length; ++i)
+					tps.ifaces_defined [i] = inflator.Inflate (defined[i]);
+			}
+
+			var ifaces = Interfaces;
 			if (ifaces != null) {
 				tps.ifaces = new List<TypeSpec> (ifaces.Count);
 				for (int i = 0; i < ifaces.Count; ++i)
@@ -1186,8 +1225,8 @@ namespace Mono.CSharp {
 			if (BaseType.BuiltinType != BuiltinTypeSpec.Type.Object && BaseType.BuiltinType != BuiltinTypeSpec.Type.ValueType)
 				cache.AddBaseType (BaseType);
 
-			if (ifaces != null) {
-				foreach (var iface_type in Interfaces) {
+			if (InterfacesDefined != null) {
+				foreach (var iface_type in InterfacesDefined) {
 					cache.AddInterface (iface_type);
 				}
 			}
@@ -1198,8 +1237,11 @@ namespace Mono.CSharp {
 					if (b_type.BuiltinType != BuiltinTypeSpec.Type.Object && b_type.BuiltinType != BuiltinTypeSpec.Type.ValueType)
 						cache.AddBaseType (b_type);
 
-					if (ta.Interfaces != null) {
-						foreach (var iface_type in ta.Interfaces) {
+					var tps = ta as TypeParameterSpec;
+					var ifaces = tps != null ? tps.InterfacesDefined : ta.Interfaces;
+
+					if (ifaces != null) {
+						foreach (var iface_type in ifaces) {
 							cache.AddInterface (iface_type);
 						}
 					}
@@ -1244,6 +1286,22 @@ namespace Mono.CSharp {
 			for (int i = 0; i < md.TypeParametersCount; ++i) {
 				if (tps[i].IsConstrained) {
 					return true;
+				}
+			}
+
+			return false;
+		}
+
+		public bool HasDependencyOn (TypeSpec type)
+		{
+			if (TypeArguments != null) {
+				foreach (var targ in TypeArguments) {
+					if (TypeSpecComparer.Override.IsEqual (targ, type))
+						return true;
+
+					var tps = targ as TypeParameterSpec;
+					if (tps != null && tps.HasDependencyOn (type))
+						return true;
 				}
 			}
 
@@ -1613,6 +1671,16 @@ namespace Mono.CSharp {
 
 		#endregion
 
+		public override bool AddInterface (TypeSpec iface)
+		{
+			var inflator = CreateLocalInflator (context);
+			iface = inflator.Inflate (iface);
+			if (iface == null)
+				return false;
+
+			return base.AddInterface (iface);
+		}
+
 		public static bool ContainsTypeParameter (TypeSpec type)
 		{
 			if (type.Kind == MemberKind.TypeParameter)
@@ -1822,7 +1890,7 @@ namespace Mono.CSharp {
 						if (iface_inflated == null)
 							continue;
 
-						AddInterface (iface_inflated);
+						base.AddInterface (iface_inflated);
 					}
 				}
 
@@ -2364,6 +2432,7 @@ namespace Mono.CSharp {
 							return false;
 
 						ok = false;
+						break;
 					}
 				}
 			}
@@ -2378,6 +2447,7 @@ namespace Mono.CSharp {
 							return false;
 
 						ok = false;
+						break;
 					}
 				}
 			}
@@ -2422,12 +2492,8 @@ namespace Mono.CSharp {
 
 			if (atype.IsGenericParameter) {
 				var tps = (TypeParameterSpec) atype;
-				if (tps.TypeArguments != null) {
-					foreach (var targ in tps.TypeArguments) {
-						if (TypeSpecComparer.Override.IsEqual (targ, ttype))
-							return true;
-					}
-				}
+				if (tps.HasDependencyOn (ttype))
+					return true;
 
 				if (Convert.ImplicitTypeParameterConversion (null, tps, ttype) != null)
 					return true;
@@ -3157,7 +3223,7 @@ namespace Mono.CSharp {
 			AParametersCollection d_parameters = invoke.Parameters;
 			return AllTypesAreFixed (d_parameters.Types);
 		}
-		
+
 		bool IsFixed (TypeSpec type)
 		{
 			return IsUnfixed (type) == -1;
@@ -3243,12 +3309,12 @@ namespace Mono.CSharp {
 					//
 					if (t.BuiltinType == BuiltinTypeSpec.Type.Dynamic)
 						u_candidates.Add (t);
+				}
 
-					if (t.Interfaces != null) {
-						foreach (var iface in t.Interfaces) {
-							if (open_v == iface.MemberDefinition)
-								u_candidates.Add (iface);
-						}
+				if (u.Interfaces != null) {
+					foreach (var iface in u.Interfaces) {
+						if (open_v == iface.MemberDefinition)
+							u_candidates.Add (iface);
 					}
 				}
 
@@ -3364,7 +3430,7 @@ namespace Mono.CSharp {
 				var invoke = Delegate.GetInvokeMethod (t);
 				TypeSpec rtype = invoke.ReturnType;
 
-				if (!rtype.IsGenericParameter && !TypeManager.IsGenericType (rtype))
+				if (!IsReturnTypeNonDependent (ec, invoke, rtype))
 					return 0;
 
 				// LAMESPEC: Standard does not specify that all methodgroup arguments
@@ -3377,14 +3443,11 @@ namespace Mono.CSharp {
 					if (inflated == null)
 						return 0;
 
-					if (IsUnfixed (inflated) >= 0)
-						return 0;
-
 					param_types[i] = inflated;
 				}
 
 				MethodGroupExpr mg = (MethodGroupExpr) e;
-				Arguments args = DelegateCreation.CreateDelegateMethodArguments (invoke.Parameters, param_types, e.Location);
+				Arguments args = DelegateCreation.CreateDelegateMethodArguments (ec, invoke.Parameters, param_types, e.Location);
 				mg = mg.OverloadResolve (ec, ref args, null, OverloadResolver.Restrictions.CovariantDelegate | OverloadResolver.Restrictions.ProbingOnly);
 				if (mg == null)
 					return 0;

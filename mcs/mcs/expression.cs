@@ -4643,7 +4643,7 @@ namespace Mono.CSharp
 						// ambiguous because 1 literal can be converted to short.
 						//
 						if (conv_false_expr != null) {
-							if (conv_false_expr is IntConstant && conv is Constant) {
+							if (conv_false_expr.Type.BuiltinType == BuiltinTypeSpec.Type.Int && conv is Constant) {
 								type = true_type;
 								conv_false_expr = null;
 							} else if (type.BuiltinType == BuiltinTypeSpec.Type.Int && conv_false_expr is Constant) {
@@ -7233,7 +7233,7 @@ namespace Mono.CSharp
 		}
 	}
 
-	public class RefValueExpr : ShimExpression
+	public class RefValueExpr : ShimExpression, IAssignMethod
 	{
 		FullNamedExpression texpr;
 
@@ -7267,13 +7267,44 @@ namespace Mono.CSharp
 			return this;
 		}
 
+		public override Expression DoResolveLValue (ResolveContext rc, Expression right_side)
+		{
+			return DoResolve (rc);
+		}
+
 		public override void Emit (EmitContext ec)
 		{
 			expr.Emit (ec);
 			ec.Emit (OpCodes.Refanyval, type);
 			ec.EmitLoadFromPtr (type);
 		}
-		
+
+		public void Emit (EmitContext ec, bool leave_copy)
+		{
+			throw new NotImplementedException ();
+		}
+
+		public void EmitAssign (EmitContext ec, Expression source, bool leave_copy, bool isCompound)
+		{
+			expr.Emit (ec);
+			ec.Emit (OpCodes.Refanyval, type);
+			source.Emit (ec);
+
+			LocalTemporary temporary = null;
+			if (leave_copy) {
+				ec.Emit (OpCodes.Dup);
+				temporary = new LocalTemporary (source.Type);
+				temporary.Store (ec);
+			}
+
+			ec.EmitStoreFromPtr (type);
+
+			if (temporary != null) {
+				temporary.Emit (ec);
+				temporary.Release (ec);
+			}
+		}
+
 		public override object Accept (StructuralVisitor visitor)
 		{
 			return visitor.Visit (this);
@@ -8045,7 +8076,7 @@ namespace Mono.CSharp
 						return null;
 					}
 
-					if (member_lookup is MethodGroupExpr) {
+					if (member_lookup is MethodGroupExpr || member_lookup is PropertyExpr) {
 						// Leave it to overload resolution to report correct error
 					} else if (!(member_lookup is TypeExpr)) {
 						// TODO: rc.SymbolRelatedToPreviousError
@@ -8064,13 +8095,9 @@ namespace Mono.CSharp
 
 			TypeExpr texpr = member_lookup as TypeExpr;
 			if (texpr != null) {
-				if (!(expr is TypeExpr)) {
-					me = expr as MemberExpr;
-					if (me == null || me.ProbeIdenticalTypeName (rc, expr, sn) == expr) {
-						rc.Report.Error (572, loc, "`{0}': cannot reference a type through an expression; try `{1}' instead",
-							Name, member_lookup.GetSignatureForError ());
-						return null;
-					}
+				if (!(expr is TypeExpr) && (sn == null || expr.ProbeIdenticalTypeName (rc, expr, sn) == expr)) {
+					rc.Report.Error (572, loc, "`{0}': cannot reference a type through an expression. Consider using `{1}' instead",
+						Name, texpr.GetSignatureForError ());
 				}
 
 				if (!texpr.Type.IsAccessible (rc)) {
@@ -8223,6 +8250,11 @@ namespace Mono.CSharp
 
 			rc.Module.Compiler.Report.Error (426, loc, "The nested type `{0}' does not exist in the type `{1}'",
 				Name, expr_type.GetSignatureForError ());
+		}
+
+		protected override void Error_InvalidExpressionStatement (Report report, Location loc)
+		{
+			base.Error_InvalidExpressionStatement (report, LeftExpression.Location);
 		}
 
 		protected override void Error_TypeDoesNotContainDefinition (ResolveContext ec, TypeSpec type, string name)
@@ -9879,9 +9911,11 @@ namespace Mono.CSharp
 	{
 		IList<Expression> initializers;
 		bool is_collection_initialization;
-		
-		public static readonly CollectionOrObjectInitializers Empty = 
-			new CollectionOrObjectInitializers (Array.AsReadOnly (new Expression [0]), Location.Null);
+
+		public CollectionOrObjectInitializers (Location loc)
+			: this (new Expression[0], loc)
+		{
+		}
 
 		public CollectionOrObjectInitializers (IList<Expression> initializers, Location loc)
 		{
@@ -10091,6 +10125,7 @@ namespace Mono.CSharp
 
 		CollectionOrObjectInitializers initializers;
 		IMemoryLocation instance;
+		DynamicExpressionStatement dynamic;
 
 		public NewInitialize (FullNamedExpression requested_type, Arguments arguments, CollectionOrObjectInitializers initializers, Location l)
 			: base (requested_type, arguments, l)
@@ -10135,16 +10170,32 @@ namespace Mono.CSharp
 			if (type == null)
 				return null;
 
+			if (type.IsDelegate) {
+				ec.Report.Error (1958, Initializers.Location,
+					"Object and collection initializers cannot be used to instantiate a delegate");
+			}
+
 			Expression previous = ec.CurrentInitializerVariable;
 			ec.CurrentInitializerVariable = new InitializerTargetExpression (this);
 			initializers.Resolve (ec);
 			ec.CurrentInitializerVariable = previous;
+
+			dynamic = e as DynamicExpressionStatement;
+			if (dynamic != null)
+				return this;
+
 			return e;
 		}
 
 		public override bool Emit (EmitContext ec, IMemoryLocation target)
 		{
-			bool left_on_stack = base.Emit (ec, target);
+			bool left_on_stack;
+			if (dynamic != null) {
+				dynamic.Emit (ec);
+				left_on_stack = true;
+			} else {
+				left_on_stack = base.Emit (ec, target);
+			}
 
 			if (initializers.IsEmpty)
 				return left_on_stack;
