@@ -2189,6 +2189,7 @@ typedef struct unload_data {
 static void
 unload_data_unref (unload_data *data)
 {
+#ifndef HOST_WIN32
 	gint32 count;
 	do {
 		mono_atomic_load_acquire (count, gint32, &data->refcount);
@@ -2198,6 +2199,7 @@ unload_data_unref (unload_data *data)
 			return;
 		}
 	} while (InterlockedCompareExchange (&data->refcount, count, count - 1) != count);
+#endif
 }
 
 static void
