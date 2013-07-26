@@ -1461,6 +1461,7 @@ private_file_needs_copying (const char *src, struct stat *sbuf_src, char *dest)
 	struct stat sbuf_dest;
 	gchar *stat_src;
 	gchar *real_src = mono_portability_find_file (src, TRUE);
+	time_t tnow;
 
 	if (!real_src)
 		stat_src = (gchar*)src;
