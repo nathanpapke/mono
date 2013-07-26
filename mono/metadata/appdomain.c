@@ -1461,6 +1461,7 @@ private_file_needs_copying (const char *src, struct stat *sbuf_src, char *dest)
 	struct stat sbuf_dest;
 	gchar *stat_src;
 	gchar *real_src = mono_portability_find_file (src, TRUE);
+	time_t tnow;
 
 	if (!real_src)
 		stat_src = (gchar*)src;
@@ -1471,7 +1472,7 @@ private_file_needs_copying (const char *src, struct stat *sbuf_src, char *dest)
 		if (real_src)
 			g_free (real_src);
 
-		time_t tnow = time (NULL);
+		tnow = time(NULL);
 		memset (sbuf_src, 0, sizeof (*sbuf_src));
 		sbuf_src->st_mtime = tnow;
 		sbuf_src->st_atime = tnow;
