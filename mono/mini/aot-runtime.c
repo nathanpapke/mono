@@ -908,6 +908,12 @@ decode_method_ref_with_target (MonoAotModule *module, MethodRef *ref, MonoMethod
 				if (!m)
 					return FALSE;
 				ref->method = mono_marshal_get_synchronized_inner_wrapper (m);
+			} else if (subtype == WRAPPER_SUBTYPE_ARRAY_ACCESSOR) {
+				MonoMethod *m = decode_resolve_method_ref (module, p, &p);
+
+				if (!m)
+					return FALSE;
+				ref->method = mono_marshal_get_array_accessor_wrapper (m);
 			} else if (subtype == WRAPPER_SUBTYPE_GSHAREDVT_IN) {
 				ref->method = mono_marshal_get_gsharedvt_in_wrapper ();
 			} else if (subtype == WRAPPER_SUBTYPE_GSHAREDVT_OUT) {
@@ -2186,11 +2192,13 @@ decode_llvm_mono_eh_frame (MonoAotModule *amodule, MonoDomain *domain,
 	}
 
 	code_start = amodule->code + amodule->code_offsets [table [(pos * 2)]];
-	if (pos + 1 == fde_count)
-		/* End of table */
-		code_end = amodule->code_end;
-	else
+	if (pos + 1 == fde_count) {
+		/* The +1 entry in the table contains the length of the last method */
+		int len = table [(pos + 1) * 2];
+		code_end = code_start + len;
+	} else {
 		code_end = amodule->code + amodule->code_offsets [table [(pos + 1) * 2]];
+	}
 	code_len = code_end - code_start;
 
 	g_assert (code >= code_start && code < code_end);
