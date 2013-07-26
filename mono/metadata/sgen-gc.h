@@ -1056,7 +1056,7 @@ static inline void
 sgen_dummy_use (gpointer v) {
 #if defined(__GNUC__)
 	__asm__ volatile ("" : "=r"(v) : "r"(v));
-#elif defined(_MSC_VER)
+#elif defined(_MSC_VER) && !defined(_WIN64)
 	__asm {
 		mov eax, v;
 		and eax, eax;
