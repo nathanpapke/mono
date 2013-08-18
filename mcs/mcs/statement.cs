@@ -412,8 +412,9 @@ namespace Mono.CSharp {
 						return false;
 					empty = true;
 					return true;
-				} else
-					infinite = true;
+				}
+
+				infinite = true;
 			}
 
 			ec.StartFlowBranching (FlowBranching.BranchingType.Loop, loc);
@@ -548,8 +549,9 @@ namespace Mono.CSharp {
 							return false;
 						empty = true;
 						return true;
-					} else
-						infinite = true;
+					}
+
+					infinite = true;
 				}
 			} else
 				infinite = true;
@@ -2986,7 +2988,7 @@ namespace Mono.CSharp {
 		public override Expression CreateExpressionTree (ResolveContext ec)
 		{
 			if (statements.Count == 1) {
-				Expression expr = ((Statement) statements[0]).CreateExpressionTree (ec);
+				Expression expr = statements[0].CreateExpressionTree (ec);
 				if (scope_initializers != null)
 					expr = new BlockScopeExpression (expr, this);
 
@@ -4170,7 +4172,7 @@ namespace Mono.CSharp {
 			var ok = block.Resolve (ec);
 
  			if (case_default == null)
-				ec.CurrentBranching.CurrentUsageVector.ResetBarrier ();
+				ec.CurrentBranching.CreateSibling (null, FlowBranching.SiblingType.SwitchSection);
 
 			ec.EndFlowBranching ();
 			ec.Switch = old_switch;
@@ -5497,7 +5499,7 @@ namespace Mono.CSharp {
 		{
 			TryFinally target = (TryFinally) t;
 
-			target.stmt = (Statement) stmt.Clone (clonectx);
+			target.stmt = stmt.Clone (clonectx);
 			if (fini != null)
 				target.fini = clonectx.LookupBlock (fini);
 		}
@@ -6448,13 +6450,19 @@ namespace Mono.CSharp {
 
 		protected override void DoEmit (EmitContext ec)
 		{
-			variable.CreateBuilder (ec);
-
 			Label old_begin = ec.LoopBegin, old_end = ec.LoopEnd;
 			ec.LoopBegin = ec.DefineLabel ();
 			ec.LoopEnd = ec.DefineLabel ();
 
+			if (!(statement is Block))
+				ec.BeginCompilerScope ();
+
+			variable.CreateBuilder (ec);
+
 			statement.Emit (ec);
+
+			if (!(statement is Block))
+				ec.EndScope ();
 
 			ec.LoopBegin = old_begin;
 			ec.LoopEnd = old_end;

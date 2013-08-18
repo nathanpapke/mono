@@ -3494,6 +3494,7 @@ event_to_string (EventKind event)
 	case EVENT_KIND_USER_LOG: return "USER_LOG";
 	default:
 		g_assert_not_reached ();
+		return "";
 	}
 }
 
@@ -8998,7 +8999,7 @@ cmd_to_string (CommandSet set, int command)
 		cmds_len = G_N_ELEMENTS (event_cmds_str);
 		break;
 	default:
-		break;
+		return NULL;
 	}
 	if (command > 0 && command <= cmds_len)
 		return cmds [command - 1];
