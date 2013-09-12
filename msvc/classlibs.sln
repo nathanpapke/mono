@@ -1,12 +1,21 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "corlib-basic", "..\..\mcs\class\corlib\corlib-basic.csproj", "{155AEF28-C81F-405D-9072-9D52780E3E70}"
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Express 2012 for Windows Desktop
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "corlib-net_2_0", "..\mcs\class\corlib\corlib-net_2_0.csproj", "{EB7444A6-C3E6-4224-BDB0-63CA3B4F2B87}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System-basic", "..\..\mcs\class\System\System-basic.csproj", "{BE8EAA89-6796-474D-BBB7-0868181CEFD1}"
-	ProjectSection(ProjectDependencies) = postProject
-		{155AEF28-C81F-405D-9072-9D52780E3E70} = {155AEF28-C81F-405D-9072-9D52780E3E70}
-	EndProjectSection
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Configuration-net_2_0", "..\mcs\class\System.Configuration\System.Configuration-net_2_0.csproj", "{8131BE5D-BE64-4BA5-A62D-FAC4BE0A0B53}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Security-net_2_0", "..\mcs\class\Mono.Security\Mono.Security-net_2_0.csproj", "{4E3E4544-4E21-4C60-8FE9-FA40DC952435}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Xml-net_2_0-2", "..\mcs\class\System.XML\System.Xml-net_2_0-2.csproj", "{ED1DF972-C3B9-4EA0-8FE6-5493ADD1707D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System-net_2_0-2", "..\mcs\class\System\System-net_2_0-2.csproj", "{51A334B4-7BCD-4075-9DEF-CA7CBB67EFAC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System-net_2_0-1", "..\mcs\class\System\System-net_2_0-1.csproj", "{AFBB6AF5-85D1-4B62-BFF9-59963237128E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Xml-net_2_0-1", "..\mcs\class\System.XML\System.Xml-net_2_0-1.csproj", "{6FEFD487-A61D-4CF0-9BE1-1641991E5661}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Security-net_2_0", "..\mcs\class\System.Security\System.Security-net_2_0.csproj", "{1A468E0B-8690-4595-BBD7-D9A5002DFF26}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -14,14 +23,38 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{155AEF28-C81F-405D-9072-9D52780E3E70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{155AEF28-C81F-405D-9072-9D52780E3E70}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{155AEF28-C81F-405D-9072-9D52780E3E70}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{155AEF28-C81F-405D-9072-9D52780E3E70}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BE8EAA89-6796-474D-BBB7-0868181CEFD1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BE8EAA89-6796-474D-BBB7-0868181CEFD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BE8EAA89-6796-474D-BBB7-0868181CEFD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BE8EAA89-6796-474D-BBB7-0868181CEFD1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB7444A6-C3E6-4224-BDB0-63CA3B4F2B87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB7444A6-C3E6-4224-BDB0-63CA3B4F2B87}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB7444A6-C3E6-4224-BDB0-63CA3B4F2B87}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB7444A6-C3E6-4224-BDB0-63CA3B4F2B87}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8131BE5D-BE64-4BA5-A62D-FAC4BE0A0B53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8131BE5D-BE64-4BA5-A62D-FAC4BE0A0B53}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8131BE5D-BE64-4BA5-A62D-FAC4BE0A0B53}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8131BE5D-BE64-4BA5-A62D-FAC4BE0A0B53}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4E3E4544-4E21-4C60-8FE9-FA40DC952435}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4E3E4544-4E21-4C60-8FE9-FA40DC952435}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4E3E4544-4E21-4C60-8FE9-FA40DC952435}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4E3E4544-4E21-4C60-8FE9-FA40DC952435}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED1DF972-C3B9-4EA0-8FE6-5493ADD1707D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED1DF972-C3B9-4EA0-8FE6-5493ADD1707D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED1DF972-C3B9-4EA0-8FE6-5493ADD1707D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED1DF972-C3B9-4EA0-8FE6-5493ADD1707D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{51A334B4-7BCD-4075-9DEF-CA7CBB67EFAC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51A334B4-7BCD-4075-9DEF-CA7CBB67EFAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51A334B4-7BCD-4075-9DEF-CA7CBB67EFAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51A334B4-7BCD-4075-9DEF-CA7CBB67EFAC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AFBB6AF5-85D1-4B62-BFF9-59963237128E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AFBB6AF5-85D1-4B62-BFF9-59963237128E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AFBB6AF5-85D1-4B62-BFF9-59963237128E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AFBB6AF5-85D1-4B62-BFF9-59963237128E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6FEFD487-A61D-4CF0-9BE1-1641991E5661}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6FEFD487-A61D-4CF0-9BE1-1641991E5661}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6FEFD487-A61D-4CF0-9BE1-1641991E5661}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6FEFD487-A61D-4CF0-9BE1-1641991E5661}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A468E0B-8690-4595-BBD7-D9A5002DFF26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A468E0B-8690-4595-BBD7-D9A5002DFF26}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A468E0B-8690-4595-BBD7-D9A5002DFF26}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A468E0B-8690-4595-BBD7-D9A5002DFF26}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
