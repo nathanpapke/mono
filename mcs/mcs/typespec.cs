@@ -211,7 +211,7 @@ namespace Mono.CSharp
 		//
 		// Returns true for instances of IList<T>, IEnumerable<T>, ICollection<T>
 		//
-		public virtual bool IsGenericIterateInterface {
+		public virtual bool IsArrayGenericInterface {
 			get {
 				return false;
 			}
@@ -320,6 +320,9 @@ namespace Mono.CSharp
 
 				if (Kind == MemberKind.Void)
 					return true;
+
+				if (Kind == MemberKind.TypeParameter)
+					return false;
 
 				if (IsNested && DeclaringType.IsGenericOrParentIsGeneric)
 					return false;
