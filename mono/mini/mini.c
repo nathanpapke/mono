@@ -153,6 +153,8 @@ gboolean disable_vtypes_in_regs = FALSE;
 
 gboolean mono_dont_free_global_codeman;
 
+static GSList *tramp_infos;
+
 gpointer
 mono_realloc_native_code (MonoCompile *cfg)
 {
@@ -326,9 +328,9 @@ get_method_from_ip (void *ip)
 		else
 			return NULL;
 	}
-	method = mono_method_full_name (ji->method, TRUE);
+	method = mono_method_full_name (jinfo_get_method (ji), TRUE);
 	/* FIXME: unused ? */
-	location = mono_debug_lookup_source_location (ji->method, (guint32)((guint8*)ip - (guint8*)ji->code_start), domain);
+	location = mono_debug_lookup_source_location (jinfo_get_method (ji), (guint32)((guint8*)ip - (guint8*)ji->code_start), domain);
 
 	res = g_strdup_printf (" %s + 0x%x (%p %p) [%p - %s]", method, (int)((char*)ip - (char*)ji->code_start), ji->code_start, (char*)ji->code_start + ji->code_size, domain, domain->friendly_name);
 
@@ -382,6 +384,7 @@ mono_print_method_from_ip (void *ip)
 	FindTrampUserData user_data;
 	MonoGenericSharingContext*gsctx;
 	const char *shared_type;
+	GSList *l;
 	
 	ji = mini_jit_info_table_find (domain, ip, &target_domain);
 	if (!ji) {
@@ -394,14 +397,23 @@ mono_print_method_from_ip (void *ip)
 			char *mname = mono_method_full_name (user_data.method, TRUE);
 			printf ("IP %p is a JIT trampoline for %s\n", ip, mname);
 			g_free (mname);
+			return;
 		}
-		else
-			g_print ("No method at %p\n", ip);
+		for (l = tramp_infos; l; l = l->next) {
+			MonoTrampInfo *tinfo = l->data;
+
+			if ((guint8*)ip >= tinfo->code && (guint8*)ip <= tinfo->code + tinfo->code_size) {
+				printf ("IP %p is at offset 0x%x of trampoline '%s'.\n", ip, (int)((guint8*)ip - tinfo->code), tinfo->name);
+				return;
+			}
+		}
+
+		g_print ("No method at %p\n", ip);
 		fflush (stdout);
 		return;
 	}
-	method = mono_method_full_name (ji->method, TRUE);
-	source = mono_debug_lookup_source_location (ji->method, (guint32)((guint8*)ip - (guint8*)ji->code_start), target_domain);
+	method = mono_method_full_name (jinfo_get_method (ji), TRUE);
+	source = mono_debug_lookup_source_location (jinfo_get_method (ji), (guint32)((guint8*)ip - (guint8*)ji->code_start), target_domain);
 
 	gsctx = mono_jit_info_get_generic_sharing_context (ji);
 	shared_type = "";
@@ -430,6 +442,8 @@ mono_print_method_from_ip (void *ip)
  */
 gboolean mono_method_same_domain (MonoJitInfo *caller, MonoJitInfo *callee)
 {
+	MonoMethod *cmethod;
+
 	if (!caller || !callee)
 		return FALSE;
 
@@ -440,8 +454,9 @@ gboolean mono_method_same_domain (MonoJitInfo *caller, MonoJitInfo *callee)
 	if (caller->domain_neutral && !callee->domain_neutral)
 		return FALSE;
 
-	if ((caller->method->klass == mono_defaults.appdomain_class) &&
-		(strstr (caller->method->name, "InvokeInDomain"))) {
+	cmethod = jinfo_get_method (caller);
+	if ((cmethod->klass == mono_defaults.appdomain_class) &&
+		(strstr (cmethod->name, "InvokeInDomain"))) {
 		 /* The InvokeInDomain methods change the current appdomain */
 		return FALSE;
 	}
@@ -631,6 +646,26 @@ mono_tramp_info_free (MonoTrampInfo *info)
 		g_free (l->data);
 	g_slist_free (info->unwind_ops);
 	g_free (info);
+}
+
+/*
+ * mono_tramp_info_register:
+ *
+ * Remember INFO for use by mono_print_method_from_ip ().
+ */
+void
+mono_tramp_info_register (MonoTrampInfo *info)
+{
+	MonoTrampInfo *copy;
+
+	copy = g_new0 (MonoTrampInfo, 1);
+	copy->code = info->code;
+	copy->code_size = info->code_size;
+	copy->name = g_strdup (info->name);
+
+	mono_loader_lock_if_inited ();
+	tramp_infos = g_slist_prepend (tramp_infos, copy);
+	mono_loader_unlock_if_inited ();
 }
 
 G_GNUC_UNUSED static void
@@ -2878,6 +2913,8 @@ mini_get_tls_offset (MonoJitTlsKey key)
 	return offset;
 }
 
+#ifndef DISABLE_JIT
+
 static MonoInst*
 mono_create_tls_get_offset (MonoCompile *cfg, int offset)
 {
@@ -2938,6 +2975,8 @@ mono_get_lmf_intrinsic (MonoCompile* cfg)
 {
 	return mono_create_tls_get (cfg, TLS_KEY_LMF);
 }
+
+#endif /* !DISABLE_JIT */
 
 void
 mono_add_patch_info (MonoCompile *cfg, int ip, MonoJumpInfoType type, gconstpointer target)
@@ -3774,6 +3813,8 @@ mono_save_seq_point_info (MonoCompile *cfg)
 
 		sp->il_offset = ins->inst_imm;
 		sp->native_offset = ins->inst_offset;
+		if (ins->flags & MONO_INST_NONEMPTY_STACK)
+			sp->flags |= MONO_SEQ_POINT_FLAG_NONEMPTY_STACK;
 
 		/* Used below */
 		ins->backend.size = i;
@@ -4129,7 +4170,7 @@ create_jit_info_for_trampoline (MonoMethod *wrapper, MonoTrampInfo *info)
 	}
 
 	jinfo = mono_domain_alloc0 (domain, MONO_SIZEOF_JIT_INFO);
-	jinfo->method = wrapper;
+	jinfo->d.method = wrapper;
 	jinfo->code_start = info->code;
 	jinfo->code_size = info->code_size;
 	jinfo->used_regs = mono_cache_unwind_info (uw_info, info_len);
@@ -4209,7 +4250,7 @@ create_jit_info (MonoCompile *cfg, MonoMethod *method_to_compile)
 				generic_info_size + holes_size + arch_eh_info_size + cas_size);
 	}
 
-	jinfo->method = cfg->method_to_register;
+	jinfo->d.method = cfg->method_to_register;
 	jinfo->code_start = cfg->native_code;
 	jinfo->code_size = cfg->code_len;
 	jinfo->used_regs = cfg->used_int_regs;
@@ -5624,7 +5665,7 @@ void
 mono_emit_jit_map (MonoJitInfo *jinfo)
 {
 	if (perf_map_file) {
-		char *name = mono_method_full_name (jinfo->method, TRUE);
+		char *name = mono_method_full_name (jinfo_get_method (jinfo), TRUE);
 		mono_emit_jit_tramp (jinfo->code_start, jinfo->code_size, name);
 		g_free (name);
 	}
@@ -5893,7 +5934,7 @@ mono_jit_compile_method_inner (MonoMethod *method, MonoDomain *target_domain, in
 	}
 	
 	if (code == NULL) {
-		mono_internal_hash_table_insert (&target_domain->jit_code_hash, cfg->jit_info->method, cfg->jit_info);
+		mono_internal_hash_table_insert (&target_domain->jit_code_hash, cfg->jit_info->d.method, cfg->jit_info);
 		mono_domain_jit_code_hash_unlock (target_domain);
 		code = cfg->native_code;
 
