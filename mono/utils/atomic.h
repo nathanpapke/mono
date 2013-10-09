@@ -42,6 +42,10 @@ static inline gint64 InterlockedCompareExchange64(volatile gint64 *dest, gint64 
 }
 #endif
 
+#ifdef _MSC_VER
+#define InterlockedCompareExchange64 _InterlockedCompareExchange64
+#endif
+
 /* Prefer GCC atomic ops if the target supports it (see configure.in). */
 #elif defined(USE_GCC_ATOMIC_OPS)
 

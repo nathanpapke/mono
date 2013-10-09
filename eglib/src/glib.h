@@ -272,6 +272,7 @@ gint    g_ascii_xdigit_value (gchar c);
 #ifdef _MSC_VER
 #define g_strcasecmp stricmp
 #define g_strncasecmp strnicmp
+#define strtoull _strtoi64
 #define g_strstrip(a) g_strchug (g_strchomp (a))
 #else
 #define g_strcasecmp strcasecmp
