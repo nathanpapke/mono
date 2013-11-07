@@ -11,7 +11,6 @@
     <OutputPath>bin\Debug\Moonlight.Build.Tasks-net_4_0</OutputPath>
     <NoStdLib>True</NoStdLib>
     <NoConfig>True</NoConfig>
-    
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>
     </RootNamespace>
@@ -27,6 +26,7 @@
     <DefineConstants>DEBUG;TRACE;NET_1_1;NET_2_0;NET_3_0;NET_3_5;NET_4_0</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <OutputPath>bin\Debug\4.0\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -35,6 +35,7 @@
     <DefineConstants>NET_1_1;NET_2_0;NET_3_0;NET_3_5;NET_4_0</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <OutputPath>bin\Release\4.0\</OutputPath>
   </PropertyGroup>
   <!-- Set AddAdditionalExplicitAssemblyReferences to false, otherwise if targetting .NET4.0, 
   Microsoft.NETFramework.props will force a dependency on the assembly System.Core. This
@@ -49,7 +50,8 @@
     <Compile Include="Moonlight.Build.Tasks\GenerateXap.cs" />
     <Compile Include="Moonlight.Build.Tasks\GetMoonlightFrameworkPath.cs" />
     <Compile Include="Moonlight.Build.Tasks\Respack.cs" />
-    <Compile Include="Moonlight.Build.Tasks\XamlG.cs" />  </ItemGroup>
+    <Compile Include="Moonlight.Build.Tasks\XamlG.cs" />
+  </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
@@ -59,44 +61,41 @@
   -->
   <PropertyGroup>
     <PreBuildEvent>
-
     </PreBuildEvent>
-    <PostBuildEvent>
-      xcopy $(TargetName).* $(ProjectDir)..\lib\net_4_0\ /Y /R /D
-  </PostBuildEvent>
+    <PostBuildEvent>start xcopy "$(TargetDir)$(TargetName).*" "$(ProjectDir)..\lib\4.0\" /Y /R /D</PostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\corlib\corlib-net_4_0.csproj">
-      <Project>{3874F10B-9AE4-4A7E-873B-42FFDCE80CB7}</Project>
-      <Name>corlib\corlib-net_4_0</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\System\System-net_4_0-2.csproj">
-      <Project>{8260E24F-1471-4320-AB5B-7CC7B68521E3}</Project>
-      <Name>System\System-net_4_0-2</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\System.XML\System.Xml-net_4_0-1.csproj">
-      <Project>{51720A26-B4D9-4B84-8CB5-9CBA57477FBB}</Project>
-      <Name>System.XML\System.Xml-net_4_0-1</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Microsoft.Build.Engine\Microsoft.Build.Engine-net_4_0.csproj">
-      <Project>{9B0AC297-CB85-43C1-8C18-12997CF1B78D}</Project>
-      <Name>Microsoft.Build.Engine\Microsoft.Build.Engine-net_4_0</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Microsoft.Build.Framework\Microsoft.Build.Framework-net_4_0.csproj">
-      <Project>{1D4BCF4D-31D1-4F92-A2B2-D9E41A640649}</Project>
-      <Name>Microsoft.Build.Framework\Microsoft.Build.Framework-net_4_0</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Microsoft.Build.Utilities\Microsoft.Build.Utilities-net_4_0.csproj">
-      <Project>{A20F004B-16AC-44DE-A14E-2C2B5E9F72BE}</Project>
-      <Name>Microsoft.Build.Utilities\Microsoft.Build.Utilities-net_4_0</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Microsoft.Build.Tasks\Microsoft.Build.Tasks-net_4_0.csproj">
-      <Project>{0F2C25D7-DF2E-4F4B-85D8-7EFC4DCD3B0C}</Project>
-      <Name>Microsoft.Build.Tasks\Microsoft.Build.Tasks-net_4_0</Name>
+      <Project>{3874f10b-9ae4-4a7e-873b-42ffdce80cb7}</Project>
+      <Name>corlib-net_4_0</Name>
     </ProjectReference>
     <ProjectReference Include="..\ICSharpCode.SharpZipLib\ICSharpCode.SharpZipLib-net_4_0.csproj">
-      <Project>{2DE2CFB0-3166-41D9-B0B5-EFBE309DD7B7}</Project>
-      <Name>ICSharpCode.SharpZipLib\ICSharpCode.SharpZipLib-net_4_0</Name>
+      <Project>{2de2cfb0-3166-41d9-b0b5-efbe309dd7b7}</Project>
+      <Name>ICSharpCode.SharpZipLib-net_4_0</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Microsoft.Build.Engine\Microsoft.Build.Engine-net_4_0.csproj">
+      <Project>{9b0ac297-cb85-43c1-8c18-12997cf1b78d}</Project>
+      <Name>Microsoft.Build.Engine-net_4_0</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Microsoft.Build.Framework\Microsoft.Build.Framework-net_4_0.csproj">
+      <Project>{1d4bcf4d-31d1-4f92-a2b2-d9e41a640649}</Project>
+      <Name>Microsoft.Build.Framework-net_4_0</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Microsoft.Build.Tasks\Microsoft.Build.Tasks-net_4_0.csproj">
+      <Project>{0f2c25d7-df2e-4f4b-85d8-7efc4dcd3b0c}</Project>
+      <Name>Microsoft.Build.Tasks-net_4_0</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Microsoft.Build.Utilities\Microsoft.Build.Utilities-net_4_0.csproj">
+      <Project>{a20f004b-16ac-44de-a14e-2c2b5e9f72be}</Project>
+      <Name>Microsoft.Build.Utilities-net_4_0</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\System.XML\System.Xml-net_4_0.csproj">
+      <Project>{8bf2fa62-9f71-4d96-a5d6-3dd903b25ed8}</Project>
+      <Name>System.Xml-net_4_0</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\System\System-net_4_0.csproj">
+      <Project>{267c4423-c2e5-4ea8-9f3b-f2b13efa4ccc}</Project>
+      <Name>System-net_4_0</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
