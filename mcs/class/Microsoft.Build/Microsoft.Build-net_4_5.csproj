@@ -11,7 +11,6 @@
     <OutputPath>bin\Debug\Microsoft.Build-net_4_5</OutputPath>
     <NoStdLib>True</NoStdLib>
     <NoConfig>True</NoConfig>
-    
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>
     </RootNamespace>
@@ -27,6 +26,7 @@
     <DefineConstants>DEBUG;TRACE;NET_1_1;NET_2_0;NET_3_0;NET_3_5;NET_4_0;NET_4_5</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <OutputPath>bin\Debug\4.5\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -35,6 +35,7 @@
     <DefineConstants>NET_1_1;NET_2_0;NET_3_0;NET_3_5;NET_4_0;NET_4_5</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <OutputPath>bin\Release\4.5\</OutputPath>
   </PropertyGroup>
   <!-- Set AddAdditionalExplicitAssemblyReferences to false, otherwise if targetting .NET4.0, 
   Microsoft.NETFramework.props will force a dependency on the assembly System.Core. This
@@ -111,7 +112,8 @@
     <Compile Include="Microsoft.Build.Logging\FileLogger.cs" />
     <Compile Include="Microsoft.Build.Logging\ForwardingLoggerRecord.cs" />
     <Compile Include="Microsoft.Build.Logging\LoggerDescription.cs" />
-    <Compile Include="Microsoft.Build.Logging\WriteHandler.cs" />  </ItemGroup>
+    <Compile Include="Microsoft.Build.Logging\WriteHandler.cs" />
+  </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
@@ -121,36 +123,33 @@
   -->
   <PropertyGroup>
     <PreBuildEvent>
-
     </PreBuildEvent>
-    <PostBuildEvent>
-      xcopy $(TargetName).* $(ProjectDir)..\lib\net_4_5\ /Y /R /D
-  </PostBuildEvent>
+    <PostBuildEvent>start xcopy "$(TargetDir)$(TargetName).*" "$(ProjectDir)..\lib\4.5\" /Y /R /D</PostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\corlib\corlib-net_4_5.csproj">
-      <Project>{07C1F58B-9E99-47F8-A847-79EDA5157DA8}</Project>
-      <Name>corlib\corlib-net_4_5</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\System\System-net_4_5-2.csproj">
-      <Project>{38FCD731-0E11-46F7-A31B-DCBE853AD8D7}</Project>
-      <Name>System\System-net_4_5-2</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\System.Core\System.Core-net_4_5.csproj">
-      <Project>{D8260595-C32F-4AC3-9C01-2CD2528CFA1D}</Project>
-      <Name>System.Core\System.Core-net_4_5</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\System.XML\System.Xml-net_4_5-1.csproj">
-      <Project>{4ED6CCE8-8E8A-4D82-8BCA-3EA4D4203AA4}</Project>
-      <Name>System.XML\System.Xml-net_4_5-1</Name>
+      <Project>{07c1f58b-9e99-47f8-a847-79eda5157da8}</Project>
+      <Name>corlib-net_4_5</Name>
     </ProjectReference>
     <ProjectReference Include="..\Microsoft.Build.Engine\Microsoft.Build.Engine-net_4_5.csproj">
-      <Project>{0DA63190-E6E1-41C5-B683-A54FADBE61CB}</Project>
-      <Name>Microsoft.Build.Engine\Microsoft.Build.Engine-net_4_5</Name>
+      <Project>{0da63190-e6e1-41c5-b683-a54fadbe61cb}</Project>
+      <Name>Microsoft.Build.Engine-net_4_5</Name>
     </ProjectReference>
     <ProjectReference Include="..\Microsoft.Build.Framework\Microsoft.Build.Framework-net_4_5.csproj">
-      <Project>{2BAFB878-D329-46A5-93AF-5A4ECD403A13}</Project>
-      <Name>Microsoft.Build.Framework\Microsoft.Build.Framework-net_4_5</Name>
+      <Project>{2bafb878-d329-46a5-93af-5a4ecd403a13}</Project>
+      <Name>Microsoft.Build.Framework-net_4_5</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\System.Core\System.Core-net_4_5.csproj">
+      <Project>{d8260595-c32f-4ac3-9c01-2cd2528cfa1d}</Project>
+      <Name>System.Core-net_4_5</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\System.XML\System.Xml-net_4_5.csproj">
+      <Project>{f96f7491-66db-4291-8803-f2f165b33b55}</Project>
+      <Name>System.Xml-net_4_5</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\System\System-net_4_5.csproj">
+      <Project>{c86fcd4e-6a52-4595-8f9e-5270607d5ea9}</Project>
+      <Name>System-net_4_5</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
