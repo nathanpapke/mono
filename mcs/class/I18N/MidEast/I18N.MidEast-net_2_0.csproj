@@ -27,6 +27,7 @@
     <DefineConstants>DEBUG;TRACE;NET_1_1;NET_2_0</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <OutputPath>bin\Debug\2.0\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -35,6 +36,7 @@
     <DefineConstants>NET_1_1;NET_2_0</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <OutputPath>bin\Release\2.0\</OutputPath>
   </PropertyGroup>
   <!-- Set AddAdditionalExplicitAssemblyReferences to false, otherwise if targetting .NET4.0, 
   Microsoft.NETFramework.props will force a dependency on the assembly System.Core. This
@@ -52,7 +54,8 @@
     <Compile Include="CP28596.cs" />
     <Compile Include="CP28598.cs" />
     <Compile Include="CP28599.cs" />
-    <Compile Include="CP38598.cs" />  </ItemGroup>
+    <Compile Include="CP38598.cs" />
+  </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
@@ -62,20 +65,17 @@
   -->
   <PropertyGroup>
     <PreBuildEvent>
-
     </PreBuildEvent>
-    <PostBuildEvent>
-      xcopy $(TargetName).* $(ProjectDir)..\lib\net_2_0\ /Y /R /D
-  </PostBuildEvent>
+    <PostBuildEvent>start xcopy "$(TargetDir)$(TargetName).*" "$(ProjectDir)..\lib\2.0\" /Y /R /D</PostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\corlib\corlib-net_2_0.csproj">
-      <Project>{EB7444A6-C3E6-4224-BDB0-63CA3B4F2B87}</Project>
-      <Name>corlib\corlib-net_2_0</Name>
+    <ProjectReference Include="..\..\corlib\corlib-net_2_0.csproj">
+      <Project>{eb7444a6-c3e6-4224-bdb0-63ca3b4f2b87}</Project>
+      <Name>corlib-net_2_0</Name>
     </ProjectReference>
-    <ProjectReference Include="..\I18N\Common\I18N-net_2_0.csproj">
-      <Project>{B4A11584-7362-47A0-9E27-0E4DE9539D77}</Project>
-      <Name>Common\I18N-net_2_0</Name>
+    <ProjectReference Include="..\Common\I18N-net_2_0.csproj">
+      <Project>{b4a11584-7362-47a0-9e27-0e4de9539d77}</Project>
+      <Name>I18N-net_2_0</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
