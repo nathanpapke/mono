@@ -27,6 +27,7 @@
     <DefineConstants>DEBUG;TRACE;NET_1_1;NET_2_0;SQLITE_STANDARD</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <OutputPath>bin\Debug\2.0\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -35,6 +36,7 @@
     <DefineConstants>NET_1_1;NET_2_0;SQLITE_STANDARD</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <OutputPath>bin\Release\2.0\</OutputPath>
   </PropertyGroup>
   <!-- Set AddAdditionalExplicitAssemblyReferences to false, otherwise if targetting .NET4.0, 
   Microsoft.NETFramework.props will force a dependency on the assembly System.Core. This
@@ -75,7 +77,8 @@
     <Compile Include="Mono.Data.Sqlite_2.0\SQLiteStatement.cs" />
     <Compile Include="Mono.Data.Sqlite_2.0\SQLiteTransaction.cs" />
     <Compile Include="Mono.Data.Sqlite_2.0\SR.Designer.cs" />
-    <Compile Include="Mono.Data.Sqlite_2.0\UnsafeNativeMethods.cs" />  </ItemGroup>
+    <Compile Include="Mono.Data.Sqlite_2.0\UnsafeNativeMethods.cs" />
+  </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
@@ -85,32 +88,29 @@
   -->
   <PropertyGroup>
     <PreBuildEvent>
-
     </PreBuildEvent>
-    <PostBuildEvent>
-      xcopy $(TargetName).* $(ProjectDir)..\lib\net_2_0\ /Y /R /D
-  </PostBuildEvent>
+    <PostBuildEvent>start xcopy "$(TargetDir)$(TargetName).*" "$(ProjectDir)..\lib\2.0\" /Y /R /D</PostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\corlib\corlib-net_2_0.csproj">
-      <Project>{EB7444A6-C3E6-4224-BDB0-63CA3B4F2B87}</Project>
-      <Name>corlib\corlib-net_2_0</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\System\System-net_2_0-2.csproj">
-      <Project>{79F25FD7-0D76-4526-AF39-1A648649A827}</Project>
-      <Name>System\System-net_2_0-2</Name>
+      <Project>{eb7444a6-c3e6-4224-bdb0-63ca3b4f2b87}</Project>
+      <Name>corlib-net_2_0</Name>
     </ProjectReference>
     <ProjectReference Include="..\System.Data\System.Data-net_2_0.csproj">
-      <Project>{49220562-83E1-49A2-971F-5D31C4AB0258}</Project>
-      <Name>System.Data\System.Data-net_2_0</Name>
+      <Project>{49220562-83e1-49a2-971f-5d31c4ab0258}</Project>
+      <Name>System.Data-net_2_0</Name>
     </ProjectReference>
     <ProjectReference Include="..\System.Transactions\System.Transactions-net_2_0.csproj">
-      <Project>{DD1B3195-5FEA-46A2-99B5-9839CA60485C}</Project>
-      <Name>System.Transactions\System.Transactions-net_2_0</Name>
+      <Project>{dd1b3195-5fea-46a2-99b5-9839ca60485c}</Project>
+      <Name>System.Transactions-net_2_0</Name>
     </ProjectReference>
-    <ProjectReference Include="..\System.XML\System.Xml-net_2_0-1.csproj">
-      <Project>{D9776E38-7673-45F6-BF19-7B77830DF9CA}</Project>
-      <Name>System.XML\System.Xml-net_2_0-1</Name>
+    <ProjectReference Include="..\System.XML\System.Xml-net_2_0-2.csproj">
+      <Project>{ed1df972-c3b9-4ea0-8fe6-5493add1707d}</Project>
+      <Name>System.Xml-net_2_0-2</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\System\System-net_2_0-2.csproj">
+      <Project>{51a334b4-7bcd-4075-9def-ca7cbb67efac}</Project>
+      <Name>System-net_2_0-2</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
