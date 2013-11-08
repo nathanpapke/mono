@@ -11,7 +11,6 @@
     <OutputPath>bin\Debug\System.Security-net_2_0</OutputPath>
     <NoStdLib>True</NoStdLib>
     <NoConfig>True</NoConfig>
-    
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>
     </RootNamespace>
@@ -27,6 +26,7 @@
     <DefineConstants>DEBUG;TRACE;NET_1_1;NET_2_0;SECURITY_DEP</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <OutputPath>bin\Debug\2_0\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -35,6 +35,7 @@
     <DefineConstants>NET_1_1;NET_2_0;SECURITY_DEP</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <OutputPath>bin\Release\2_0\</OutputPath>
   </PropertyGroup>
   <!-- Set AddAdditionalExplicitAssemblyReferences to false, otherwise if targetting .NET4.0, 
   Microsoft.NETFramework.props will force a dependency on the assembly System.Core. This
@@ -139,7 +140,8 @@
     <Compile Include="System.Security.Permissions\DataProtectionPermission.cs" />
     <Compile Include="System.Security.Permissions\DataProtectionPermissionAttribute.cs" />
     <Compile Include="System.Security.Permissions\DataProtectionPermissionFlags.cs" />
-    <Compile Include="System.Security.Permissions\PermissionHelper.cs" />  </ItemGroup>
+    <Compile Include="System.Security.Permissions\PermissionHelper.cs" />
+  </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
@@ -149,28 +151,26 @@
   -->
   <PropertyGroup>
     <PreBuildEvent>
-
     </PreBuildEvent>
-    <PostBuildEvent>
-      xcopy $(TargetName).* $(ProjectDir)..\lib\net_2_0\ /Y /R /D
-  </PostBuildEvent>
+    <PostBuildEvent>start xcopy "$(TargetDir)$(TargetName).*" "$(ProjectDir)..\lib\2.0\" /Y /R /D
+</PostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\corlib\corlib-net_2_0.csproj">
-      <Project>{EB7444A6-C3E6-4224-BDB0-63CA3B4F2B87}</Project>
-      <Name>corlib\corlib-net_2_0</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\System\System-net_2_0-1.csproj">
-      <Project>{FE5BDC7B-FCD6-4351-B638-656CAFA12CAB}</Project>
-      <Name>System\System-net_2_0-1</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\System.XML\System.Xml-net_2_0.csproj">
-      <Project>{2EB99669-03DF-4DF7-9B20-0B6E6C9DBFEF}</Project>
-      <Name>System.XML\System.Xml-net_2_0</Name>
+      <Project>{eb7444a6-c3e6-4224-bdb0-63ca3b4f2b87}</Project>
+      <Name>corlib-net_2_0</Name>
     </ProjectReference>
     <ProjectReference Include="..\Mono.Security\Mono.Security-net_2_0.csproj">
-      <Project>{6785B2B5-3B06-48F3-9E6C-99B23B9AAC4F}</Project>
-      <Name>Mono.Security\Mono.Security-net_2_0</Name>
+      <Project>{4e3e4544-4e21-4c60-8fe9-fa40dc952435}</Project>
+      <Name>Mono.Security-net_2_0</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\System.XML\System.Xml-net_2_0-1.csproj">
+      <Project>{6fefd487-a61d-4cf0-9be1-1641991e5661}</Project>
+      <Name>System.Xml-net_2_0-1</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\System\System-net_2_0-2.csproj">
+      <Project>{51a334b4-7bcd-4075-9def-ca7cbb67efac}</Project>
+      <Name>System-net_2_0-2</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
