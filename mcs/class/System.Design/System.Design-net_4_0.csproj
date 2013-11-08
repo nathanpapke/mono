@@ -11,7 +11,6 @@
     <OutputPath>bin\Debug\System.Design-net_4_0</OutputPath>
     <NoStdLib>True</NoStdLib>
     <NoConfig>True</NoConfig>
-    
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>
     </RootNamespace>
@@ -27,6 +26,7 @@
     <DefineConstants>DEBUG;TRACE;NET_1_1;NET_2_0;NET_3_0;NET_3_5;NET_4_0;DRAWING_DESIGN_DEP</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <OutputPath>bin\Debug\4.0\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -35,6 +35,7 @@
     <DefineConstants>NET_1_1;NET_2_0;NET_3_0;NET_3_5;NET_4_0;DRAWING_DESIGN_DEP</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <OutputPath>bin\Release\4.0\</OutputPath>
   </PropertyGroup>
   <!-- Set AddAdditionalExplicitAssemblyReferences to false, otherwise if targetting .NET4.0, 
   Microsoft.NETFramework.props will force a dependency on the assembly System.Core. This
@@ -369,7 +370,8 @@
     <Compile Include="System.Windows.Forms.Design\TabPageCollectionEditor.cs" />
     <Compile Include="System.Windows.Forms.Design\UISelectionService.cs" />
     <Compile Include="System.Windows.Forms.Design\WindowsFormsDesignerOptionService.cs" />
-    <Compile Include="System.Windows.Forms.Design\WndProcRouter.cs" />  </ItemGroup>
+    <Compile Include="System.Windows.Forms.Design\WndProcRouter.cs" />
+  </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
@@ -379,55 +381,55 @@
   -->
   <PropertyGroup>
     <PreBuildEvent>
-
     </PreBuildEvent>
-    <PostBuildEvent>
-      xcopy $(TargetName).* $(ProjectDir)..\lib\net_4_0\ /Y /R /D
-  </PostBuildEvent>
+    <PostBuildEvent>start xcopy "$(TargetDir)$(TargetName).*" "$(ProjectDir)..\lib\4.0\" /Y /R /D</PostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Accessibility\Accessibility-net_4_0.csproj">
+      <Project>{3c0e9135-1458-47f6-9076-17ffb1e3e32f}</Project>
+      <Name>Accessibility-net_4_0</Name>
+    </ProjectReference>
     <ProjectReference Include="..\corlib\corlib-net_4_0.csproj">
-      <Project>{3874F10B-9AE4-4A7E-873B-42FFDCE80CB7}</Project>
-      <Name>corlib\corlib-net_4_0</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\System\System-net_4_0-2.csproj">
-      <Project>{8260E24F-1471-4320-AB5B-7CC7B68521E3}</Project>
-      <Name>System\System-net_4_0-2</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\System.XML\System.Xml-net_4_0-1.csproj">
-      <Project>{51720A26-B4D9-4B84-8CB5-9CBA57477FBB}</Project>
-      <Name>System.XML\System.Xml-net_4_0-1</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\System.Web\System.Web-net_4_0-1.csproj">
-      <Project>{77D30907-035D-4382-AA43-5A8EE294EA33}</Project>
-      <Name>System.Web\System.Web-net_4_0-1</Name>
+      <Project>{3874f10b-9ae4-4a7e-873b-42ffdce80cb7}</Project>
+      <Name>corlib-net_4_0</Name>
     </ProjectReference>
     <ProjectReference Include="..\Managed.Windows.Forms\System.Windows.Forms-net_4_0.csproj">
-      <Project>{41B3B369-328C-45B8-9F14-224641427A35}</Project>
-      <Name>Managed.Windows.Forms\System.Windows.Forms-net_4_0</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\System.Drawing\System.Drawing-net_4_0.csproj">
-      <Project>{DE98E72C-2727-4737-AAFC-CC1228F4812C}</Project>
-      <Name>System.Drawing\System.Drawing-net_4_0</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Accessibility\Accessibility-net_4_0.csproj">
-      <Project>{3C0E9135-1458-47F6-9076-17FFB1E3E32F}</Project>
-      <Name>Accessibility\Accessibility-net_4_0</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\System.Data\System.Data-net_4_0.csproj">
-      <Project>{BC1890C0-51E5-48D0-8DBA-B1DD23468F9C}</Project>
-      <Name>System.Data\System.Data-net_4_0</Name>
+      <Project>{41b3b369-328c-45b8-9f14-224641427a35}</Project>
+      <Name>System.Windows.Forms-net_4_0</Name>
     </ProjectReference>
     <ProjectReference Include="..\System.Configuration\System.Configuration-net_4_0.csproj">
-      <Project>{CA49630B-FD24-411F-9651-B15CA72CE5B8}</Project>
-      <Name>System.Configuration\System.Configuration-net_4_0</Name>
+      <Project>{ca49630b-fd24-411f-9651-b15ca72ce5b8}</Project>
+      <Name>System.Configuration-net_4_0</Name>
     </ProjectReference>
-    <ProjectReference Include="..\System.Drawing.Design\System.Drawing.Design-net_2_0.csproj">
-      <Project>{21BEB426-C8FA-484B-A7B0-1D4A5BF3307B}</Project>
-      <Name>System.Drawing.Design\System.Drawing.Design-net_2_0</Name>
+    <ProjectReference Include="..\System.Data\System.Data-net_4_0.csproj">
+      <Project>{bc1890c0-51e5-48d0-8dba-b1dd23468f9c}</Project>
+      <Name>System.Data-net_4_0</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\System.Drawing.Design\System.Drawing.Design-net_4_0.csproj">
+      <Project>{8c367062-efef-4765-b1b1-5553608f6a60}</Project>
+      <Name>System.Drawing.Design-net_4_0</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\System.Drawing\System.Drawing-net_4_0.csproj">
+      <Project>{de98e72c-2727-4737-aafc-cc1228f4812c}</Project>
+      <Name>System.Drawing-net_4_0</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\System.Web\System.Web-net_4_0.csproj">
+      <Project>{bac369e3-e94e-4e5a-97ff-0cf696d07814}</Project>
+      <Name>System.Web-net_4_0</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\System.XML\System.Xml-net_4_0.csproj">
+      <Project>{8bf2fa62-9f71-4d96-a5d6-3dd903b25ed8}</Project>
+      <Name>System.Xml-net_4_0</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\System\System-net_4_0.csproj">
+      <Project>{267c4423-c2e5-4ea8-9f3b-f2b13efa4ccc}</Project>
+      <Name>System-net_4_0</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
 </Project>
