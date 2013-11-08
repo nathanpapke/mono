@@ -11,7 +11,6 @@
     <OutputPath>bin\Debug\System.Security-net_4_0</OutputPath>
     <NoStdLib>True</NoStdLib>
     <NoConfig>True</NoConfig>
-    
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>
     </RootNamespace>
@@ -27,6 +26,7 @@
     <DefineConstants>DEBUG;TRACE;NET_1_1;NET_2_0;NET_3_0;NET_3_5;NET_4_0;SECURITY_DEP</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <OutputPath>bin\Debug\4_0\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -35,6 +35,7 @@
     <DefineConstants>NET_1_1;NET_2_0;NET_3_0;NET_3_5;NET_4_0;SECURITY_DEP</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <OutputPath>bin\Release\4_0\</OutputPath>
   </PropertyGroup>
   <!-- Set AddAdditionalExplicitAssemblyReferences to false, otherwise if targetting .NET4.0, 
   Microsoft.NETFramework.props will force a dependency on the assembly System.Core. This
@@ -139,7 +140,8 @@
     <Compile Include="System.Security.Permissions\DataProtectionPermission.cs" />
     <Compile Include="System.Security.Permissions\DataProtectionPermissionAttribute.cs" />
     <Compile Include="System.Security.Permissions\DataProtectionPermissionFlags.cs" />
-    <Compile Include="System.Security.Permissions\PermissionHelper.cs" />  </ItemGroup>
+    <Compile Include="System.Security.Permissions\PermissionHelper.cs" />
+  </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
@@ -149,28 +151,25 @@
   -->
   <PropertyGroup>
     <PreBuildEvent>
-
     </PreBuildEvent>
-    <PostBuildEvent>
-      xcopy $(TargetName).* $(ProjectDir)..\lib\net_4_0\ /Y /R /D
-  </PostBuildEvent>
+    <PostBuildEvent>start xcopy "$(TargetDir)$(TargetName).*" "$(ProjectDir)..\lib\4.0\" /Y /R /D</PostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\corlib\corlib-net_4_0.csproj">
-      <Project>{3874F10B-9AE4-4A7E-873B-42FFDCE80CB7}</Project>
-      <Name>corlib\corlib-net_4_0</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\System\System-net_4_0-1.csproj">
-      <Project>{FCBCCC55-006E-41B2-A649-CF9A843E34BD}</Project>
-      <Name>System\System-net_4_0-1</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\System.XML\System.Xml-net_4_0.csproj">
-      <Project>{8BF2FA62-9F71-4D96-A5D6-3DD903B25ED8}</Project>
-      <Name>System.XML\System.Xml-net_4_0</Name>
+      <Project>{3874f10b-9ae4-4a7e-873b-42ffdce80cb7}</Project>
+      <Name>corlib-net_4_0</Name>
     </ProjectReference>
     <ProjectReference Include="..\Mono.Security\Mono.Security-net_4_0.csproj">
-      <Project>{5E680987-7C43-48A0-9BF1-86124ACA78BD}</Project>
-      <Name>Mono.Security\Mono.Security-net_4_0</Name>
+      <Project>{5e680987-7c43-48a0-9bf1-86124aca78bd}</Project>
+      <Name>Mono.Security-net_4_0</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\System.XML\System.Xml-net_4_0.csproj">
+      <Project>{8bf2fa62-9f71-4d96-a5d6-3dd903b25ed8}</Project>
+      <Name>System.Xml-net_4_0</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\System\System-net_4_0.csproj">
+      <Project>{267c4423-c2e5-4ea8-9f3b-f2b13efa4ccc}</Project>
+      <Name>System-net_4_0</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
