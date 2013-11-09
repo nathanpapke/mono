@@ -5,13 +5,12 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{2EB99669-03DF-4DF7-9B20-0B6E6C9DBFEF}</ProjectGuid>
+    <ProjectGuid>{6FEFD487-A61D-4CF0-9BE1-1641991E5661}</ProjectGuid>
     <OutputType>Library</OutputType>
     <NoWarn>1699,618,612,642</NoWarn>
     <OutputPath>bin\Debug\System.Xml-net_2_0</OutputPath>
     <NoStdLib>True</NoStdLib>
     <NoConfig>True</NoConfig>
-    
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>
     </RootNamespace>
@@ -27,14 +26,16 @@
     <DefineConstants>DEBUG;TRACE;NET_1_1;NET_2_0;CONFIGURATION_DEP</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <OutputPath>bin\Debug\2_0\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <NoWarn>1699,618,612,642</NoWarn>
     <Optimize>true</Optimize>
-    <DefineConstants>NET_1_1;NET_2_0;CONFIGURATION_DEP</DefineConstants>
+    <DefineConstants>NET_1_1;NET_2_0</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <OutputPath>bin\Release\2_0\</OutputPath>
   </PropertyGroup>
   <!-- Set AddAdditionalExplicitAssemblyReferences to false, otherwise if targetting .NET4.0, 
   Microsoft.NETFramework.props will force a dependency on the assembly System.Core. This
@@ -104,6 +105,10 @@
     <Compile Include="Mono.Xml.Xsl\HtmlEmitter.cs" />
     <Compile Include="Mono.Xml.Xsl\MSXslScriptManager.cs" />
     <Compile Include="Mono.Xml.Xsl\Outputter.cs" />
+    <Compile Include="Mono.Xml.Xsl\PatternParser.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Mono.Xml.Xsl\PatternTokenizer.cs" />
     <Compile Include="Mono.Xml.Xsl\ScriptCompilerInfo.cs" />
     <Compile Include="Mono.Xml.Xsl\TextEmitter.cs" />
     <Compile Include="Mono.Xml.Xsl\TextOutputter.cs" />
@@ -220,7 +225,6 @@
     <Compile Include="System.Xml.Serialization.Advanced\SchemaImporterExtension.cs" />
     <Compile Include="System.Xml.Serialization.Advanced\SchemaImporterExtensionCollection.cs" />
     <Compile Include="System.Xml.Serialization.Configuration\DateTimeSerializationSection.cs" />
-    <Compile Include="System.Xml.Serialization.Configuration\SchemaImporterExtensionElement.cs" />
     <Compile Include="System.Xml.Serialization.Configuration\SchemaImporterExtensionElementCollection.cs" />
     <Compile Include="System.Xml.Serialization.Configuration\SchemaImporterExtensionsSection.cs" />
     <Compile Include="System.Xml.Serialization.Configuration\SerializationSectionGroup.cs" />
@@ -233,7 +237,9 @@
     <Compile Include="System.Xml.Serialization\IXmlSerializable.cs" />
     <Compile Include="System.Xml.Serialization\IXmlTextParser.cs" />
     <Compile Include="System.Xml.Serialization\KeyHelper.cs" />
-    <Compile Include="System.Xml.Serialization\MapCodeGenerator.cs" />
+    <Compile Include="System.Xml.Serialization\MapCodeGenerator.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="System.Xml.Serialization\ReflectionHelper.cs" />
     <Compile Include="System.Xml.Serialization\SchemaImporter.cs" />
     <Compile Include="System.Xml.Serialization\SchemaTypes.cs" />
@@ -322,7 +328,12 @@
     <Compile Include="System.Xml.XPath\Expression.cs" />
     <Compile Include="System.Xml.XPath\Iterator.cs" />
     <Compile Include="System.Xml.XPath\IXPathNavigable.cs" />
-    <Compile Include="System.Xml.XPath\Tokenizer.cs" />
+    <Compile Include="System.Xml.XPath\Parser.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="System.Xml.XPath\Tokenizer.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="System.Xml.XPath\XmlCaseOrder.cs" />
     <Compile Include="System.Xml.XPath\XmlDataType.cs" />
     <Compile Include="System.Xml.XPath\XmlSortOrder.cs" />
@@ -432,9 +443,7 @@
     <Compile Include="System.Xml\XmlWriter.cs" />
     <Compile Include="System.Xml\XmlWriterSettings.cs" />
     <Compile Include="System.Xml\XQueryConvert.cs" />
-    <Compile Include="Mono.Xml.Xsl\PatternParser.cs" />
-    <Compile Include="Mono.Xml.Xsl\PatternTokenizer.cs" />
-    <Compile Include="System.Xml.XPath\Parser.cs" />  </ItemGroup>
+  </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
@@ -443,33 +452,23 @@
   </Target>
   -->
   <PropertyGroup>
-    <PreBuildEvent>
-$(ProjectDir)\..\..\..\mono\msvc\scripts\prepare.exe $(ProjectDir)..\.. xml
-$(ProjectDir)\..\..\jay\jay.exe -ct &lt; $(ProjectDir)\..\..\jay\skeleton.cs $(ProjectDir)\System.Xml.XPath\Parser.jay > $(ProjectDir)\System.Xml.XPath\Parser.cs
-echo #define XSLT_PATTERN > $(ProjectDir)\Mono.Xml.Xsl\PatternParser.cs
-$(ProjectDir)\..\..\jay\jay.exe -ct &lt; $(ProjectDir)\..\..\jay\skeleton.cs $(ProjectDir)\Mono.Xml.Xsl\PatternParser.jay >> $(ProjectDir)\Mono.Xml.Xsl\PatternParser.cs
-echo #define XSLT_PATTERN > $(ProjectDir)\Mono.Xml.Xsl\PatternTokenizer.cs
-type $(ProjectDir)\System.Xml.XPath\Tokenizer.cs >> $(ProjectDir)\Mono.Xml.Xsl\PatternTokenizer.cs
-
-    </PreBuildEvent>
-    <PostBuildEvent>
-      xcopy $(TargetName).* $(ProjectDir)..\lib\net_2_0\ /Y /R /D
-  </PostBuildEvent>
+    <PreBuildEvent>"$(ProjectDir)..\..\jay\jay.exe" -ct &lt; "$(ProjectDir)..\..\jay\skeleton.cs" "$(ProjectDir)System.Xml.XPath\Parser.jay" &gt; "$(ProjectDir)System.Xml.XPath\Parser.cs"
+echo #define XSLT_PATTERN &gt; "$(ProjectDir)Mono.Xml.Xsl\PatternParser.cs"
+"$(ProjectDir)..\..\jay\jay.exe" -ct &lt; "$(ProjectDir)..\..\jay\skeleton.cs" "$(ProjectDir)Mono.Xml.Xsl\PatternParser.jay" &gt;&gt; "$(ProjectDir)Mono.Xml.Xsl\PatternParser.cs"
+echo #define XSLT_PATTERN &gt; "$(ProjectDir)Mono.Xml.Xsl\PatternTokenizer.cs"
+type "$(ProjectDir)System.Xml.XPath\Tokenizer.cs" &gt;&gt; "$(ProjectDir)Mono.Xml.Xsl\PatternTokenizer.cs"</PreBuildEvent>
+    <PostBuildEvent>start xcopy "$(TargetDir)$(TargetName).*" "$(ProjectDir)..\lib\2.0\" /Y /R /D
+</PostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\corlib\corlib-net_2_0.csproj">
-      <Project>{EB7444A6-C3E6-4224-BDB0-63CA3B4F2B87}</Project>
-      <Name>corlib\corlib-net_2_0</Name>
+      <Project>{eb7444a6-c3e6-4224-bdb0-63ca3b4f2b87}</Project>
+      <Name>corlib-net_2_0</Name>
     </ProjectReference>
-    <ProjectReference Include="..\System\System-net_2_0.csproj">
-      <Project>{245C754C-D6DE-4434-BA78-37A93E196236}</Project>
-      <Name>System\System-net_2_0</Name>
+    <ProjectReference Include="..\System\System-net_2_0-1.csproj">
+      <Project>{afbb6af5-85d1-4b62-bff9-59963237128e}</Project>
+      <Name>System-net_2_0-1</Name>
     </ProjectReference>
-    <Reference Include="System.Configuration.dll">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>System.Configuration.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
