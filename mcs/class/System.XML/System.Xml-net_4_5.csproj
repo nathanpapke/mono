@@ -11,7 +11,6 @@
     <OutputPath>bin\Debug\System.Xml-net_4_5</OutputPath>
     <NoStdLib>True</NoStdLib>
     <NoConfig>True</NoConfig>
-    
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>
     </RootNamespace>
@@ -27,6 +26,7 @@
     <DefineConstants>DEBUG;TRACE;NET_1_1;NET_2_0;NET_3_0;NET_3_5;NET_4_0;NET_4_5</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <OutputPath>bin\Debug\4_5\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -35,6 +35,7 @@
     <DefineConstants>NET_1_1;NET_2_0;NET_3_0;NET_3_5;NET_4_0;NET_4_5</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <OutputPath>bin\Release\4_5\</OutputPath>
   </PropertyGroup>
   <!-- Set AddAdditionalExplicitAssemblyReferences to false, otherwise if targetting .NET4.0, 
   Microsoft.NETFramework.props will force a dependency on the assembly System.Core. This
@@ -434,7 +435,8 @@
     <Compile Include="System.Xml\XQueryConvert.cs" />
     <Compile Include="Mono.Xml.Xsl\PatternParser.cs" />
     <Compile Include="Mono.Xml.Xsl\PatternTokenizer.cs" />
-    <Compile Include="System.Xml.XPath\Parser.cs" />  </ItemGroup>
+    <Compile Include="System.Xml.XPath\Parser.cs" />
+  </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
@@ -443,30 +445,24 @@
   </Target>
   -->
   <PropertyGroup>
-    <PreBuildEvent>
-$(ProjectDir)\..\..\..\mono\msvc\scripts\prepare.exe $(ProjectDir)..\.. xml
-$(ProjectDir)\..\..\jay\jay.exe -ct &lt; $(ProjectDir)\..\..\jay\skeleton.cs $(ProjectDir)\System.Xml.XPath\Parser.jay > $(ProjectDir)\System.Xml.XPath\Parser.cs
-echo #define XSLT_PATTERN > $(ProjectDir)\Mono.Xml.Xsl\PatternParser.cs
-$(ProjectDir)\..\..\jay\jay.exe -ct &lt; $(ProjectDir)\..\..\jay\skeleton.cs $(ProjectDir)\Mono.Xml.Xsl\PatternParser.jay >> $(ProjectDir)\Mono.Xml.Xsl\PatternParser.cs
-echo #define XSLT_PATTERN > $(ProjectDir)\Mono.Xml.Xsl\PatternTokenizer.cs
-type $(ProjectDir)\System.Xml.XPath\Tokenizer.cs >> $(ProjectDir)\Mono.Xml.Xsl\PatternTokenizer.cs
-
-    </PreBuildEvent>
-    <PostBuildEvent>
-      xcopy $(TargetName).* $(ProjectDir)..\lib\net_4_5\ /Y /R /D
-  </PostBuildEvent>
+    <PreBuildEvent>"$(ProjectDir)..\..\jay\jay.exe" -ct &lt; "$(ProjectDir)..\..\jay\skeleton.cs" "$(ProjectDir)System.Xml.XPath\Parser.jay" &gt; "$(ProjectDir)System.Xml.XPath\Parser.cs"
+echo #define XSLT_PATTERN &gt; "$(ProjectDir)Mono.Xml.Xsl\PatternParser.cs"
+"$(ProjectDir)..\..\jay\jay.exe" -ct &lt; "$(ProjectDir)..\..\jay\skeleton.cs" "$(ProjectDir)Mono.Xml.Xsl\PatternParser.jay" &gt;&gt; "$(ProjectDir)Mono.Xml.Xsl\PatternParser.cs"
+echo #define XSLT_PATTERN &gt; "$(ProjectDir)Mono.Xml.Xsl\PatternTokenizer.cs"
+type "$(ProjectDir)System.Xml.XPath\Tokenizer.cs" &gt;&gt; "$(ProjectDir)Mono.Xml.Xsl\PatternTokenizer.cs"</PreBuildEvent>
+    <PostBuildEvent>start xcopy "$(TargetDir)$(TargetName).*" "$(ProjectDir)..\lib\4.5\" /Y /R /D</PostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\corlib\corlib-net_4_5.csproj">
-      <Project>{07C1F58B-9E99-47F8-A847-79EDA5157DA8}</Project>
-      <Name>corlib\corlib-net_4_5</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\System\System-net_4_5.csproj">
-      <Project>{C86FCD4E-6A52-4595-8F9E-5270607D5EA9}</Project>
-      <Name>System\System-net_4_5</Name>
-    </ProjectReference>
+    <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Properties\" />
+    <ProjectReference Include="..\corlib\corlib-net_4_5.csproj">
+      <Project>{07c1f58b-9e99-47f8-a847-79eda5157da8}</Project>
+      <Name>corlib-net_4_5</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\System\System-net_4_5.csproj">
+      <Project>{c86fcd4e-6a52-4595-8f9e-5270607d5ea9}</Project>
+      <Name>System-net_4_5</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>
